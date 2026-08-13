@@ -1,0 +1,22 @@
+#particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Background par le jaane ke liye negative z-index */
+    pointer-events: none;
+    overflow: hidden;
+    background-color: #06181C; /* Dark Hero Theme background */
+}
+
+/* Particle styling jo JS banarah hai */
+.particle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #8CE5ED; /* Accent Cyan Color */
+    border-radius: 50%; /* Smooth glowing dots */
+    box-shadow: 0 0 6px #8CE5ED; /* Subtle glow effect */
+    pointer-events: none;
+}
