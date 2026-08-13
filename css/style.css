@@ -7,9 +7,10 @@
   --text-muted: #A3C0CA;
   --accent-cyan: #8CE5ED;
   --accent-teal: #124B57;
-  --accent-orange: #E26D45;
   --white: #FFFFFF;
-  --sharp-border: 0px; /* Strict sharp corners */
+  --sharp-border: 0px;
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Lato', sans-serif;
 }
 
 * {
@@ -27,6 +28,15 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+}
+/* Headings with Playfair Display */
+h1, h2, h3, h4, .form-title, .brand-logo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Wrapper Container */
@@ -288,6 +298,37 @@ input[name="auth-toggle"] {
   color: var(--text-muted);
   font-size: 0.85rem;
   line-height: 1.4;
+}
+/* Image Container Style */
+.theme-image-wrapper {
+  width: 100%;
+  height: 200px; /* Layout ke hisab se height adjust kar sakte hain */
+  margin: 20px 0;
+  background-color: var(--bg-input); /* #041013 */
+  border: 1px solid var(--accent-teal); /* #124B57 */
+  border-radius: 0px; /* Sharp corners requirement */
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image Element Style */
+.theme-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Image proportions disturb hone se bachayega */
+  object-position: center;
+  display: block;
+  filter: brightness(0.9) contrast(1.05); /* Colors blend karne ke liye subtle depth */
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+/* Subtle Hover Animation */
+.theme-image-wrapper:hover .theme-img {
+  transform: scale(1.03);
+  filter: brightness(1) contrast(1.1);
 }
 
 /* Responsive Design */

@@ -1,125 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Module 4 Hakathone</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Google Fonts Embed Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
     <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="auth-wrapper">
+      <div class="auth-container">
+        <!-- Left Section: Forms -->
+        <div class="form-section">
+          <div class="brand-logo">
+            <i class="fa-solid fa-brain"></i> Alverse
+          </div>
 
-  <div class="auth-wrapper">
-    <div class="auth-container">
-      
-      <!-- Left Section: Forms -->
-      <div class="form-section">
-        <div class="brand-logo">
-          <i class="fa-solid fa-brain"></i> Alverse
+          <!-- Hidden Radio Inputs for Toggle -->
+          <input type="radio" name="auth-toggle" id="tab-login" checked />
+          <input type="radio" name="auth-toggle" id="tab-signup" />
+
+          <!-- Custom Switch Tabs -->
+          <div class="tab-switch">
+            <label for="tab-login" class="tab-label">Sign In</label>
+            <label for="tab-signup" class="tab-label">Sign Up</label>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <form class="auth-form login-form" action="#">
+            <h2 class="form-title">Welcome back</h2>
+            <p class="form-subtitle">Please enter your account details</p>
+
+            <div class="input-group">
+              <label for="login-email">Email</label>
+              <input
+                type="email"
+                id="login-email"
+                placeholder="name@domain.com"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="login-pass">Password</label>
+              <input
+                type="password"
+                id="login-pass"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign In</button>
+
+            <div class="social-login">
+              <span>Or continue with</span>
+              <div class="social-icons">
+                <a href="#" class="social-btn"
+                  ><i class="fa-brands fa-google"></i
+                ></a>
+                <a href="#" class="social-btn"
+                  ><i class="fa-brands fa-github"></i
+                ></a>
+                <a href="#" class="social-btn"
+                  ><i class="fa-brands fa-facebook-f"></i
+                ></a>
+              </div>
+            </div>
+          </form>
+
+          <!-- SIGNUP FORM -->
+          <form class="auth-form signup-form" action="#">
+            <h2 class="form-title">Create Account</h2>
+            <p class="form-subtitle">Join us to start navigating with AI</p>
+
+            <div class="input-group">
+              <label for="signup-name">Full Name</label>
+              <input
+                type="text"
+                id="signup-name"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="signup-email">Email</label>
+              <input
+                type="email"
+                id="signup-email"
+                placeholder="name@domain.com"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="signup-pass">Password</label>
+              <input
+                type="password"
+                id="signup-pass"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              Create Account
+            </button>
+
+            <div class="social-login">
+              <span>Or register with</span>
+              <div class="social-icons">
+                <a href="#" class="social-btn"
+                  ><i class="fa-brands fa-google"></i
+                ></a>
+                <a href="#" class="social-btn"
+                  ><i class="fa-brands fa-github"></i
+                ></a>
+                <a href="#" class="social-btn"
+                  ><i class="fa-brands fa-facebook-f"></i
+                ></a>
+              </div>
+            </div>
+          </form>
         </div>
 
-        <!-- Hidden Radio Inputs for Toggle -->
-        <input type="radio" name="auth-toggle" id="tab-login" checked>
-        <input type="radio" name="auth-toggle" id="tab-signup">
+        <!-- Right Section: Feature Highlight/Testimonial Card -->
+        <div class="info-section">
+          <div class="info-card-top">
+            <h2>What's our Navigator Said.</h2>
+            <blockquote class="quote">
+              "Search and find your AI insights faster than ever. Just ask
+              Optimus and let it process your workflow."
+            </blockquote>
 
-        <!-- Custom Switch Tabs -->
-        <div class="tab-switch">
-          <label for="tab-login" class="tab-label">Sign In</label>
-          <label for="tab-signup" class="tab-label">Sign Up</label>
-        </div>
+            <!-- AI Theme Visual/Image -->
+            <div class="theme-image-wrapper">
+              <img
+                src="assets/auth.png"
+                alt="AI Neural Mesh Visual"
+                class="theme-img"
+              />
+            </div>
 
-        <!-- LOGIN FORM -->
-        <form class="auth-form login-form" action="#">
-          <h2 class="form-title">Welcome back</h2>
-          <p class="form-subtitle">Please enter your account details</p>
-
-          <div class="input-group">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" placeholder="name@domain.com" required>
-          </div>
-
-          <div class="input-group">
-            <label for="login-pass">Password</label>
-            <input type="password" id="login-pass" placeholder="••••••••" required>
-          </div>
-
-          <div class="form-options">
-            <label class="remember-me">
-              <input type="checkbox"> Keep me logged in
-            </label>
-            <a href="#" class="forgot-link">Forgot Password?</a>
-          </div>
-
-          <button type="submit" class="btn btn-primary">Sign In</button>
-
-          <div class="social-login">
-            <span>Or continue with</span>
-            <div class="social-icons">
-              <a href="#" class="social-btn"><i class="fa-brands fa-google"></i></a>
-              <a href="#" class="social-btn"><i class="fa-brands fa-github"></i></a>
-              <a href="#" class="social-btn"><i class="fa-brands fa-facebook-f"></i></a>
+            <div class="author-info">
+              <strong>Mas Parjono</strong>
+              <span>UI Designer at Alverse</span>
             </div>
           </div>
-        </form>
 
-        <!-- SIGNUP FORM -->
-        <form class="auth-form signup-form" action="#">
-          <h2 class="form-title">Create Account</h2>
-          <p class="form-subtitle">Join us to start navigating with AI</p>
-
-          <div class="input-group">
-            <label for="signup-name">Full Name</label>
-            <input type="text" id="signup-name" placeholder="John Doe" required>
-          </div>
-
-          <div class="input-group">
-            <label for="signup-email">Email</label>
-            <input type="email" id="signup-email" placeholder="name@domain.com" required>
-          </div>
-
-          <div class="input-group">
-            <label for="signup-pass">Password</label>
-            <input type="password" id="signup-pass" placeholder="••••••••" required>
-          </div>
-
-          <button type="submit" class="btn btn-primary">Create Account</button>
-
-          <div class="social-login">
-            <span>Or register with</span>
-            <div class="social-icons">
-              <a href="#" class="social-btn"><i class="fa-brands fa-google"></i></a>
-              <a href="#" class="social-btn"><i class="fa-brands fa-github"></i></a>
-              <a href="#" class="social-btn"><i class="fa-brands fa-facebook-f"></i></a>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- Right Section: Feature Highlight/Testimonial Card -->
-      <div class="info-section">
-        <div class="info-card-top">
-          <h2>What's our Navigator Said.</h2>
-          <blockquote class="quote">
-            "Search and find your AI insights faster than ever. Just ask Optimus and let it process your workflow."
-          </blockquote>
-          <div class="author-info">
-            <strong>Mas Parjono</strong>
-            <span>UI Designer at Alverse</span>
+          <div class="info-card-bottom">
+            <h3>Get your right AI tools applied now</h3>
+            <p>
+              Be among the first creators to experience the easiest way to start
+              with AI.
+            </p>
           </div>
         </div>
-
-        <div class="info-card-bottom">
-          <h3>Get your right AI tools applied now</h3>
-          <p>Be among the first creators to experience the easiest way to start with AI.</p>
-        </div>
       </div>
-
     </div>
-  </div>
 
-
-    <script src="app.js"></script>
-</body>
+    <script src="js/app.js"></script>
+  </body>
 </html>
