@@ -20,3 +20,19 @@
     box-shadow: 0 0 6px #8CE5ED; /* Subtle glow effect */
     pointer-events: none;
 }
+.typewriter-text {
+  font-family: var(--font-heading); /* Playfair Display */
+  color: var(--text-main); /* #90C8DE */
+  font-size: 2rem;
+}
+
+.cursor {
+  color: var(--accent-cyan); /* #8CE5ED */
+  font-weight: bold;
+  animation: blink 0.7s infinite alternate;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}

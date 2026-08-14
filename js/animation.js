@@ -57,3 +57,31 @@ function animateParticle(particle) {
     ease: "sine.inOut",
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  // GSAP TextPlugin register karein
+  gsap.registerPlugin(TextPlugin);
+
+  // Jo words aap display karwana chahte hain
+  const words = [
+    "AI Word Navigator",
+    "Smart Reading Assistant",
+    "Next-Gen AI Interface"
+  ];
+
+  // Master Timeline banayein
+  const masterTl = gsap.timeline({ repeat: -1 }); // -1 means Infinite Loop
+
+  words.forEach((word) => {
+    // Har word ke liye sub-timeline
+    let tl = gsap.timeline({ repeat: 1, yoyo: true, repeatDelay: 1.5 });
+    
+    tl.to("#text", {
+      duration: word.length * 0.1, // Word length ke hisab se typing speed
+      text: word,
+      ease: "none"
+    });
+
+    masterTl.add(tl);
+  });
+});
