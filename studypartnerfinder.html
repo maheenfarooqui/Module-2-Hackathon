@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Partner Finder</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="/css/studypartner.css">
+
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Study Partner Finder</h1>
+      <p>Connect with peers, collaborate on subjects, and excel together.</p>
+    </header>
+
+    <!-- Controls & Action Bar -->
+    <div class="controls-wrapper">
+      <!-- Search & Filter Card -->
+      <div class="card-box">
+        <h2 class="card-title">Search & Filter Partners</h2>
+        <div class="filters-grid">
+          <div class="form-group">
+            <label for="filterSubject">Subject</label>
+            <input type="text" id="filterSubject" placeholder="e.g. Mathematics, Computer Science" />
+          </div>
+          <div class="form-group">
+            <label for="filterSkill">Skill</label>
+            <input type="text" id="filterSkill" placeholder="e.g. Python, Essay Writing" />
+          </div>
+          <div class="form-group">
+            <label for="filterLevel">Experience Level</label>
+            <select id="filterLevel">
+              <option value="">All Levels</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Box -->
+      <div class="card-box action-card">
+        <h2 class="card-title no-border">Join the Network</h2>
+        <p class="sub-text">Create your profile to let others find you.</p>
+        <button class="btn" id="toggleFormBtn">Add My Profile</button>
+      </div>
+    </div>
+
+    <!-- Create Profile Form (Collapsible) -->
+    <div class="card-box" id="addProfileForm">
+      <h2 class="card-title">Add Your Study Profile</h2>
+      <form id="profileForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" required placeholder="e.g. Sarah Jenkins" />
+          </div>
+
+          <div class="form-group">
+            <label for="picture">Profile Picture URL</label>
+            <input type="url" id="picture" placeholder="https://example.com/photo.jpg" />
+          </div>
+
+          <div class="form-group">
+            <label for="experience">Experience Level *</label>
+            <select id="experience" required>
+              <option value="">Select Level</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="availability">Availability *</label>
+            <input type="text" id="availability" required placeholder="e.g. Weekends, Evenings after 5 PM" />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="subjects">Subjects (comma-separated) *</label>
+            <input type="text" id="subjects" required placeholder="e.g. Calculus, Physics, Linear Algebra" />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="skills">Skills (comma-separated) *</label>
+            <input type="text" id="skills" required placeholder="e.g. Problem Solving, Python, Exam Prep" />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="bio">Short Introduction *</label>
+            <textarea id="bio" rows="3" required placeholder="Briefly describe your goals and what you're looking for in a study partner..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-submit" id="submitBtn">Publish Profile</button>
+      </form>
+    </div>
+
+    <!-- Partners Grid -->
+    <div class="partners-grid" id="partnersContainer"></div>
+  </div>
+
+  <!-- Custom JavaScript Logic -->
+  <script src="/js/studypartner.js"></script>
+</body>
+</html>
