@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Module 4 Hakathone</title>
+    <title>QuadPulse - Campus Community Hub</title>
     <link rel="stylesheet" href="css/style.css" />
     <!-- Google Fonts Embed Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,8 +23,61 @@
       <div class="auth-container">
         <!-- Left Section: Forms -->
         <div class="form-section">
+          <!-- BRAND LOGO WITH IMAGE -->
           <div class="brand-logo" id="authLogo">
-            <i class="fa-solid fa-brain"></i> Alverse
+            <!-- QUADPULSE MINIMAL Q+P SVG LOGO -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="42" height="42" fill="none">
+  <defs>
+    <!-- Cyan to Dark Teal Gradient -->
+    <linearGradient id="qpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#72f2eb" />
+      <stop offset="100%" stop-color="#0e8388" />
+    </linearGradient>
+
+    <!-- Neon Glow Effect -->
+    <filter id="qpGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Hexagonal Dark Border Frame -->
+  <path d="M50 8 L88 30 L88 70 L50 92 L12 70 L12 30 Z" 
+        stroke="rgba(114, 242, 235, 0.25)" 
+        stroke-width="2.5" 
+        fill="rgba(5, 22, 24, 0.6)" />
+
+  <!-- Integrated "Q" + "P" Minimalist Cyber Path -->
+  <!-- "Q" Outer Circle & Tail -->
+  <path d="M50 24 C35 24 25 35 25 50 C25 65 35 76 50 76 C65 76 75 65 75 50 C75 35 65 24 50 24 Z" 
+        stroke="url(#qpGradient)" 
+        stroke-width="5" 
+        stroke-linecap="round" />
+  
+  <!-- "P" Vertical Stem & Loop Blend -->
+  <path d="M38 34 L38 68" 
+        stroke="#72f2eb" 
+        stroke-width="5" 
+        stroke-linecap="round" 
+        filter="url(#qpGlow)" />
+  
+  <path d="M38 34 C50 30 62 38 62 48 C62 58 50 62 38 62" 
+        stroke="url(#qpGradient)" 
+        stroke-width="4.5" 
+        stroke-linecap="round" 
+        fill="none" />
+
+  <!-- "Q" Pulse Accent Tail -->
+  <path d="M58 58 L72 72" 
+        stroke="#72f2eb" 
+        stroke-width="5" 
+        stroke-linecap="round" 
+        filter="url(#qpGlow)" />
+
+  <!-- Pulse Center Glow Node -->
+  <circle cx="50" cy="50" r="3.5" fill="#72f2eb" filter="url(#qpGlow)" />
+</svg>
+<span class="logo-text">Quad<span>Pulse</span></span>
           </div>
 
           <!-- Hidden Radio Inputs for Toggle -->
@@ -40,14 +93,14 @@
           <!-- LOGIN FORM -->
           <form class="auth-form login-form" action="#">
             <h2 class="form-title">Welcome back</h2>
-            <p class="form-subtitle">Please enter your account details</p>
+            <p class="form-subtitle">Enter your campus credentials to stay connected</p>
 
             <div class="input-group">
-              <label for="userE">Email</label>
+              <label for="userE">Campus Email</label>
               <input
                 type="email"
                 id="userE"
-                placeholder="name@domain.com"
+                placeholder="student@university.edu"
                 required
               />
             </div>
@@ -72,12 +125,12 @@
                 <button class="social-btn" id="logInWithGoogle">
                   <i class="fa-brands fa-google"></i>
                 </button>
-                <button class="social-btn"
-                  ><i class="fa-brands fa-github"></i
-                ></button>
-                <button class="social-btn"
-                  ><i class="fa-brands fa-facebook-f"></i
-                ></button>
+                <button class="social-btn">
+                  <i class="fa-brands fa-github"></i>
+                </button>
+                <button class="social-btn">
+                  <i class="fa-brands fa-facebook-f"></i>
+                </button>
               </div>
             </div>
           </form>
@@ -85,24 +138,24 @@
           <!-- SIGNUP FORM -->
           <form class="auth-form signup-form" action="#">
             <h2 class="form-title">Create Account</h2>
-            <p class="form-subtitle">Join us to start navigating with AI</p>
+            <p class="form-subtitle">Join your campus community & find study partners</p>
 
             <div class="input-group">
               <label for="userName">Full Name</label>
               <input
                 type="text"
                 id="userName"
-                placeholder="John Doe"
+                placeholder="Sarah Ahmed"
                 required
               />
             </div>
 
             <div class="input-group">
-              <label for="userEmail">Email</label>
+              <label for="userEmail">Campus Email</label>
               <input
                 type="email"
                 id="userEmail"
-                placeholder="name@domain.com"
+                placeholder="student@university.edu"
                 required
               />
             </div>
@@ -124,15 +177,15 @@
             <div class="social-login">
               <span>Or register with</span>
               <div class="social-icons">
-                <button class="social-btn" id="logInWithGoogle">
+                <button class="social-btn" id="signUpWithGoogle">
                   <i class="fa-brands fa-google"></i>
                 </button>
-                <button class="social-btn"
-                  ><i class="fa-brands fa-github"></i
-                ></button>
-                <button class="social-btn"
-                  ><i class="fa-brands fa-facebook-f"></i
-                ></button>
+                <button class="social-btn">
+                  <i class="fa-brands fa-github"></i>
+                </button>
+                <button class="social-btn">
+                  <i class="fa-brands fa-facebook-f"></i>
+                </button>
               </div>
             </div>
           </form>
@@ -141,32 +194,30 @@
         <!-- Right Section: Feature Highlight/Testimonial Card -->
         <div class="info-section">
           <div class="info-card-top">
-            <h2 id="authHeader">What's our Navigator Said.</h2>
+            <h2 id="authHeader">What Campus Leaders Say</h2>
             <blockquote class="quote">
-              "Search and find your AI insights faster than ever. Just ask
-              Optimus and let it process your workflow."
+              "QuadPulse completely transformed how we organize tech hackathons and find peer study groups across departments."
             </blockquote>
 
-            <!-- AI Theme Visual/Image -->
+            <!-- Campus Theme Visual/Image -->
             <div class="theme-image-wrapper">
               <img
                 src="assets/auth.png"
-                alt="AI Neural Mesh Visual"
+                alt="Campus Student Network Visual"
                 class="theme-img"
               />
             </div>
 
             <div class="author-info">
-              <strong>Mas Parjono</strong>
-              <span>UI Designer at Alverse</span>
+              <strong>Maheen Zuhra</strong>
+              <span>Lead Organizer at QuadPulse Community</span>
             </div>
           </div>
 
           <div class="info-card-bottom">
-            <h3>Get your right AI tools applied now</h3>
+            <h3>Connect with your campus today</h3>
             <p>
-              Be among the first creators to experience the easiest way to start
-              with AI.
+              Discover active study groups, upcoming hackathons, polls, and instant campus updates in one place.
             </p>
           </div>
         </div>
