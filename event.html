@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Events</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- SUPABASE SDK (Commented for now) -->
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="/css/event.css">
+</head>
+<body>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div>
+        <h1 class="hero-heading">Campus Events</h1>
+        <p class="hero-subtext">Discover, host, and register for upcoming academic and social events.</p>
+      </div>
+      <button class="btn-primary" onclick="openCreateModal()">
+        <i class="fa-solid fa-plus icon-left"></i> Create Event
+      </button>
+    </div>
+  </section>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+
+    <!-- SEARCH & FILTERS -->
+    <section class="filter-section">
+      <div class="search-box-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search events by title, description, or location..." oninput="applyFilters()">
+      </div>
+
+      <div class="filter-controls">
+        <div class="tab-filters">
+          <button class="tab-btn active" id="filterAllBtn" onclick="setTabFilter('all')">All Events</button>
+          <button class="tab-btn" id="filterUpcomingBtn" onclick="setTabFilter('upcoming')">Upcoming Events</button>
+        </div>
+
+        <select id="categoryFilter" class="category-select" onchange="applyFilters()">
+          <option value="all">All Categories</option>
+          <option value="Workshop">Workshop</option>
+          <option value="Seminar">Seminar</option>
+          <option value="Hackathon">Hackathon</option>
+          <option value="Social">Social</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- EVENTS GRID -->
+    <section class="events-grid" id="eventsContainer">
+      <!-- Dynamic Javascript Content -->
+    </section>
+  </main>
+
+  <!-- CREATE EVENT MODAL -->
+  <div class="modal-overlay" id="createEventModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Create New Event</h3>
+        <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+      </div>
+
+      <form id="createEventForm" onsubmit="handleCreateEvent(event)">
+        <div class="form-group">
+          <label class="form-label">Event Title</label>
+          <input type="text" id="eventTitle" class="form-control" placeholder="e.g. Modern Web Architecture Seminar" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="eventDesc" class="form-control" rows="3" placeholder="Provide event details, prerequisites, or topics covered..." required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="eventDate" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <input type="time" id="eventTime" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location / Room</label>
+          <input type="text" id="eventLocation" class="form-control" placeholder="e.g. Main Auditorium, Block B" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="eventCategory" class="form-control">
+              <option value="Workshop">Workshop</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Social">Social</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Event Image URL</label>
+            <input type="url" id="eventImage" class="form-control" placeholder="https://images.unsplash.com/..." required>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn-primary" id="submitBtn">Post Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/event.js"></script>
+</body>
+</html>

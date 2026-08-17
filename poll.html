@@ -1,41 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notifications — QuadPulse</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poll System — QuadPulse</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet" />
 
- 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
-  <!-- CSS Stylesheets -->
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/dashboard.css" />
-  <link rel="stylesheet" href="css/notification.css" />
+  <link rel="stylesheet" href="css/poll.css" />
 
   <style>
-    
-    /* Quick alignment safety fix for profile dropdown elements */
-    .hidden, .hidden-input { display: none !important; }
+    /* Profile dropdown and input safety fixes */
+    .hidden, input[type="file"].hidden-input { display: none !important; }
     .dropdown-menu { display: none; }
     .dropdown-menu.show { display: block !important; }
   </style>
 </head>
 <body>
 
-
-  <!-- HEADER NAVBAR -->
+  <!-- DASHBOARD HEADER NAVBAR -->
   <header class="navbar">
     <div class="nav-container">
       <!-- Brand Logo -->
@@ -69,28 +62,17 @@
         <a href="#" class="nav-link">Posts</a>
         <a href="#" class="nav-link">Events</a>
         <a href="#" class="nav-link">Study Partners</a>
-        <a href="#" class="nav-link">Polls</a>
+        <a href="poll.html" class="nav-link active">Polls</a>
       </nav>
 
       <!-- Right User Actions -->
       <div class="user-actions">
-        <!-- Notification Wrapper -->
+        <!-- Notification Wrapper / Link -->
         <div class="notification-wrapper" style="position: relative;">
-          <button class="notif-btn" id="bellIcon" onclick="toggleNotificationDropdown()" title="Notifications">
+          <a href="notification.html" class="notif-btn" title="Notifications">
             <i class="fa-solid fa-bell"></i>
             <span class="notif-badge" id="unreadBadge">0</span>
-          </button>
-
-          <!-- Dropdown Popup -->
-          <div class="notification-dropdown glass-card" id="notifDropdown">
-            <div class="notif-header">
-              <h4>Notifications</h4>
-              <span class="mark-read-link" onclick="markAllAsRead()">Mark all as read</span>
-            </div>
-            <div class="notif-list" id="notifList">
-              <!-- Dynamic Items -->
-            </div>
-          </div>
+          </a>
         </div>
 
         <!-- User Profile Dropdown -->
@@ -130,23 +112,56 @@
     </div>
   </header>
 
-  <!-- NOTIFICATION PAGE MAIN BODY -->
-  <main class="dashboard-main" style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
-    <div class="section-card">
-      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2><i class="fa-solid fa-bell"></i> Campus Activity Center</h2>
-        <button class="btn btn-action" onclick="markAllAsRead()"><i class="fa-solid fa-check-double"></i> Mark all read</button>
-      </div>
-      <div class="notification-list" id="pageNotifList">
-        <!-- Main page notifications rendered here -->
-      </div>
+  <!-- MAIN POLL CONTAINER -->
+  <div class="poll-container" style="margin-top: 30px;">
+    <!-- Header Action -->
+    <div class="poll-header">
+      <h2><i class="fa-solid fa-users"></i> Campus Polls</h2>
+      <button class="btn btn-accent gsap-btn" onclick="openPollModal()">
+        <i class="fa-solid fa-plus-circle"></i> Create Poll
+      </button>
     </div>
-  </main>
 
+    <!-- Active Polls Grid -->
+    <div class="polls-grid" id="polls-list">
+      <!-- Poll cards will be generated dynamically -->
+    </div>
+  </div>
+
+  <!-- Create Poll Modal -->
+  <div class="modal-overlay" id="createPollModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 class="text-accent">Create New Poll</h3>
+        <button class="close-btn" onclick="closePollModal()">&times;</button>
+      </div>
+      <form id="poll-form">
+        <div class="form-group">
+          <label>Poll Question</label>
+          <input type="text" id="poll-question" class="form-control" placeholder="e.g. Which technology should we learn next?" required>
+        </div>
+        
+        <div class="form-group" id="options-group">
+          <label>Poll Options</label>
+          <input type="text" class="form-control option-input mb-2" placeholder="Option 1" required>
+          <input type="text" class="form-control option-input mb-2" placeholder="Option 2" required>
+        </div>
+
+        <button type="button" class="btn btn-outline mb-3" onclick="addOptionInput()">
+          <i class="bi bi-plus"></i> Add Option
+        </button>
+
+        <button type="submit" class="btn btn-accent style-full">Publish Poll</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/dashboard.js"></script>
-  <script src="js/notification.js"></script>
+  <script src="js/pollanimation.js"></script>
+  <script src="js/poll.js"></script>
 </body>
 </html>
