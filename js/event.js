@@ -1,6 +1,3 @@
-/* ==========================================================
-   SUPABASE INITIALIZATION
-   ========================================================== */
 var SUPABASE_URL = "https://dpheuwopfkpdynfgjthm.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
 
@@ -9,6 +6,87 @@ var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var allEvents = [];
 var currentTabFilter = 'all';
+
+document.addEventListener("DOMContentLoaded", function () {
+  var profileTrigger = document.getElementById("profileTrigger");
+  var profileDropdown = document.getElementById("profileDropdown");
+  var profilePicInput = document.getElementById("profilePicInput");
+  var avatarInitials = document.getElementById("avatarInitials");
+  var avatarImage = document.getElementById("avatarImage");
+  var mobileToggle = document.getElementById("mobileToggle");
+  var navMenu = document.getElementById("navMenu");
+  var logoutBtn = document.getElementById("logoutBtn");
+
+  // 1. Toggle Profile Dropdown
+  if (profileTrigger) {
+    profileTrigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      profileDropdown.classList.toggle("show");
+      profileTrigger.classList.toggle("active");
+    });
+  }
+
+  // Close Dropdown when clicking outside
+  document.addEventListener("click", function () {
+    if (profileDropdown && profileTrigger) {
+      profileDropdown.classList.remove("show");
+      profileTrigger.classList.remove("active");
+    }
+  });
+
+  // 2. Profile Image Upload Preview & LocalStorage Persistence
+  var savedAvatar = localStorage.getItem("userAvatar");
+  if (savedAvatar && avatarImage && avatarInitials) {
+    avatarImage.src = savedAvatar;
+    avatarImage.classList.remove("hidden");
+    avatarInitials.classList.add("hidden");
+  }
+
+  if (profilePicInput) {
+    profilePicInput.addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+          var imageSrc = event.target.result;
+          avatarImage.src = imageSrc;
+          avatarImage.classList.remove("hidden");
+          avatarInitials.classList.add("hidden");
+          localStorage.setItem("userAvatar", imageSrc);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // 3. Mobile Navigation Toggle
+  if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener("click", function () {
+      navMenu.classList.toggle("active");
+    });
+  }
+
+  // 4. Logout Handler
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      Swal.fire({
+        title: "Logout?",
+        text: "Are you sure you want to log out of QuadPulse?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#0e8388",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Logout",
+        background: "#081d21",
+        color: "#ffffff"
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          window.location.href = "index.html";
+        }
+      });
+    });
+  }
+});
 
 // APPLICATION INITIALIZATION
 window.addEventListener('DOMContentLoaded', function () {
