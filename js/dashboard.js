@@ -441,3 +441,101 @@ function getTimeAgo(date) {
   return `${days} days ago`;
 }
 loadAnnouncements()
+
+// gsap
+
+const userName = document.getElementById("welcomeUserName");
+const text = userName.textContent;
+
+userName.textContent = "";
+
+const typewriter = gsap.timeline({
+  repeat: -1,
+  repeatDelay: 0.8,
+});
+
+typewriter
+  // Type
+  .to(
+    userName,
+    {
+      duration: text.length * 0.1,
+      ease: "none",
+      text: text,
+    }
+  )
+
+  // Wait
+  .to({}, { duration: 1 })
+
+  // Delete
+  .to(userName, {
+    duration: text.length * 0.06,
+    ease: "none",
+    text: "",
+  })
+
+  // Wait before typing again
+  .to({}, { duration: 0.5 });
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  if (typeof gsap !== "undefined" && gsap.registerPlugin && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  initParticles();
+  initButtonHoverLine();
+  initScrollArrow();
+  initPageIntro();
+  initDropdownAnimation();
+  initButtonTapFeedback();
+});
+
+// ---------------- Floating background particles ----------------
+function initParticles() {
+  const container = document.getElementById("particle-container");
+  if (!container) return;
+
+  const numParticles = 50;
+
+  for (let i = 0; i < numParticles; i++) {
+    createParticle(container);
+  }
+}
+
+function createParticle(container) {
+  const particle = document.createElement("div");
+  particle.className = "particle";
+  container.appendChild(particle);
+
+  const size = Math.random() * 2 + 2; // 2px se 7px tak
+
+  gsap.set(particle, {
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    width: size,
+    height: size,
+    opacity: Math.random() * 0.5 + 0.2,
+  });
+
+  animateParticle(particle);
+}
+
+function animateParticle(particle) {
+  gsap.to(particle, {
+    x: `+=${Math.random() * 200 - 100}`,
+    y: `+=${Math.random() * 200 - 100}`,
+    duration: Math.random() * 10 + 5,
+    ease: "none",
+    onComplete: () => animateParticle(particle),
+  });
+
+  gsap.to(particle, {
+    opacity: Math.random() * 0.8 + 0.1,
+    duration: Math.random() * 2 + 1,
+    repeat: -1,
+    yoyo: true,
+    ease: "sine.inOut",
+  });
+}
