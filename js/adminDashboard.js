@@ -9,50 +9,290 @@ const supabaseAdmin = createClient(supbaseUrl, service_role);
 async function fetchAdminDashboardStats() {
   try {
     // 1. Fetch Total Users (Assuming 'profiles' table exists, otherwise checks auth/users via profiles)
- const {
+    const {
       data: { users },
       error,
     } = await supabaseAdmin.auth.admin.listUsers();
 
     // 2. Fetch Total Posts (postApp)
     const { count: postsCount, error: postsErr } = await supabase
-      .from('postApp')
-      .select('*', { count: 'exact', head: true });
+      .from("postApp")
+      .select("*", { count: "exact", head: true });
 
     // 3. Fetch Total Events (events)
     const { count: eventsCount, error: eventsErr } = await supabase
-      .from('events')
-      .select('*', { count: 'exact', head: true });
+      .from("events")
+      .select("*", { count: "exact", head: true });
 
     // 4. Fetch Study Partners Requests (study_partners)
     const { count: studyCount, error: studyErr } = await supabase
-      .from('study_partners')
-      .select('*', { count: 'exact', head: true });
+      .from("study_partners")
+      .select("*", { count: "exact", head: true });
 
     // 5. Fetch Total Comments (commentsApp)
     const { count: commentsCount, error: commentsErr } = await supabase
-      .from('commentsApp')
-      .select('*', { count: 'exact', head: true });
+      .from("commentsApp")
+      .select("*", { count: "exact", head: true });
 
     // 6. Fetch Total Likes (likesapp)
     const { count: likesCount, error: likesErr } = await supabase
-      .from('likesApp')
-      .select('*', { count: 'exact', head: true });
+      .from("likesApp")
+      .select("*", { count: "exact", head: true });
 
     // --- DOM Update ---
-    document.getElementById('totalUsersCount').innerText =  `${users.length}` || 0;
-    document.getElementById('totalPostsCount').innerText = postsCount || 0;
-    document.getElementById('totalEventsCount').innerText = eventsCount || 0;
-    document.getElementById('studyPartnersCount').innerText = studyCount || 0;
-    document.getElementById('totalCommentsCount').innerText = commentsCount || 0;
-    document.getElementById('totalLikesCount').innerText = likesCount || 0;
-
+    document.getElementById("totalUsersCount").innerText =
+      `${users.length}` || 0;
+    document.getElementById("totalPostsCount").innerText = postsCount || 0;
+    document.getElementById("totalEventsCount").innerText = eventsCount || 0;
+    document.getElementById("studyPartnersCount").innerText = studyCount || 0;
+    document.getElementById("totalCommentsCount").innerText =
+      commentsCount || 0;
+    document.getElementById("totalLikesCount").innerText = likesCount || 0;
   } catch (error) {
-    console.error('Error fetching admin dashboard statistics:', error.message);
+    console.error("Error fetching admin dashboard statistics:", error.message);
   }
 }
 
 // Page load hone par runs automatically
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   fetchAdminDashboardStats();
 });
+
+const announcementForm = document.getElementById("adminAnnouncementForm");
+
+announcementForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById("announcementTitle").value.trim();
+  const category = document.getElementById("announcementCategory").value;
+  const description = document
+    .getElementById("announcementDescription")
+    .value.trim();
+
+  if (!title || !description) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Fields",
+      text: "Please fill all fields.",
+    });
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("announcements")
+    .insert([
+      {
+        title,
+        category,
+        description,
+      },
+    ])
+    .select();
+
+  if (error) {
+    console.error("Announcement error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Failed!",
+      text: "Failed to publish announcement.",
+    });
+    return;
+  }
+
+  console.log("Announcement published:", data);
+
+  Swal.fire({
+    icon: "success",
+    title: "Published!",
+    text: "Announcement published successfully.",
+    timer: 1800,
+    showConfirmButton: false,
+  });
+
+  announcementForm.reset();
+});
+
+loadUsersControl()
+async function loadUsersControl() {
+  let adminModerationList = document.getElementById("adminModerationList");
+
+  try {
+    const {
+      data: { users },
+      error,
+    } = await supabaseAdmin.auth.admin.listUsers();
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    console.log(users);
+
+    adminModerationList.innerHTML = "";
+
+    users.forEach((userInfo) => {
+      // First Name aur Last Name ke safety checks
+      const fName = userInfo.user_metadata.first_name || "User";
+      const lName = userInfo.user_metadata.last_name || "";
+      const email = userInfo.email || "No Email";
+      const userId = userInfo.id || "00000000";
+
+      adminModerationList.innerHTML += `
+        <div class="moderation-user">
+          
+          <div class="user-profile-circle shadow-cyan"
+               style="width: 35px; height: 35px; font-size: 0.8rem;">
+            ${fName.charAt(0).toUpperCase()}${lName ? lName.charAt(0).toUpperCase() : ""}
+          </div>
+
+          <div>
+            <span class="fw-bold d-block text-white" style="font-size: 0.85rem;">
+              ${fName} ${lName}
+            </span>
+
+            <span class="text-light opacity-50 d-block" style="font-size: 0.7rem;">
+              ${email}
+            </span>
+
+            <span class="text-light opacity-50 d-block" style="font-size: 0.65rem;">
+              ${userId.substring(0, 8)}...
+            </span>
+          </div>
+
+        <button
+  class="btn btn-sm btn-outline-danger"
+  style="font-size: 0.75rem;"
+  onclick="deleteUser('${userId}')"
+>
+  Delete
+</button>
+
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+window.deleteUser = async function (userId) {
+  const result = await Swal.fire({
+    icon: "warning",
+    title: "Are you sure?",
+    text: "Do you really want to delete this user?",
+    color: "#ffffff",
+    background: "#1e293b",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete user",
+    confirmButtonColor: "#ef4444",
+    cancelButtonColor: "#64748b",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+    if (error) {
+      console.error("Delete user error:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Failed!",
+        text: "User could not be deleted.",
+        background: "#1e293b",
+        color: "#ffffff",
+      });
+
+      return;
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "Deleted!",
+      text: "User has been deleted successfully.",
+      background: "#1e293b",
+      color: "#ffffff",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+    // Users list dobara load karo
+    loadUsersControl();
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+async function loadRecentActivities() {
+  const adminActivityLogs = document.getElementById("adminActivityLogs");
+
+  try {
+    const { data, error } = await supabase
+      .from("postApp")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading recent activities:", error);
+      return;
+    }
+
+    console.log("Recent Activities:", data);
+
+    if (!data || data.length === 0) {
+      adminActivityLogs.innerHTML = `
+        <p style="color: #94a3b8; font-size: 0.85rem; padding: 12px">
+          No recent activity found.
+        </p>
+      `;
+      return;
+    }
+
+    adminActivityLogs.innerHTML = "";
+
+    data.forEach((post) => {
+      const firstName = post.author_fname || "User";
+      const lastName = post.author_lname || "";
+
+      adminActivityLogs.innerHTML += `
+        <div class="activity-item">
+
+          <div class="user-profile-circle shadow-cyan">
+            ${firstName.charAt(0).toUpperCase()}${lastName
+              ? lastName.charAt(0).toUpperCase()
+              : ""}
+          </div>
+
+          <div class="activity-content">
+
+            <div class="activity-user">
+              ${firstName} ${lastName}
+            </div>
+
+            <div class="activity-post">
+              ${post.title || "Untitled Post"}
+            </div>
+
+            <div class="activity-description">
+              ${post.description || ""}
+            </div>
+
+          </div>
+
+          <div class="activity-date">
+            ${new Date(post.created_at).toLocaleDateString()}
+          </div>
+
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+loadRecentActivities();

@@ -338,3 +338,106 @@ async function loadMiniEvents() {
 document.addEventListener("DOMContentLoaded", () => {
   loadMiniEvents();
 });
+async function loadAnnouncements() {
+  const announcementList = document.getElementById("announcementList");
+
+  if (!announcementList) return;
+
+  try {
+    const { data, error } = await supabase
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (error) {
+      console.error("Error loading announcements:", error);
+
+      announcementList.innerHTML = `
+        <p style="color: #f87171; padding: 12px;">
+          Failed to load announcements.
+        </p>
+      `;
+
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      announcementList.innerHTML = `
+        <p style="color: #94a3b8; padding: 12px;">
+          No announcements available.
+        </p>
+      `;
+
+      return;
+    }
+
+    announcementList.innerHTML = "";
+
+    data.forEach((announcement) => {
+      const createdAt = new Date(announcement.created_at);
+
+      const timeAgo = getTimeAgo(createdAt);
+
+      const priorityClass =
+        announcement.category === "Urgent"
+          ? "priority-high"
+          : "";
+
+      announcementList.innerHTML += `
+        <div class="announcement-item ${priorityClass}">
+
+          <span class="tag">
+            ${announcement.category}
+          </span>
+
+          <h3>
+            ${announcement.title}
+          </h3>
+
+          <p>
+            ${announcement.description}
+          </p>
+
+          <span class="time-stamp">
+            ${timeAgo}
+          </span>
+
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Unexpected error:", error);
+  }
+}
+function getTimeAgo(date) {
+  const now = new Date();
+
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) {
+    return "Just now";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) {
+    return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) {
+    return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  }
+
+  const days = Math.floor(hours / 24);
+
+  if (days === 1) {
+    return "Yesterday";
+  }
+
+  return `${days} days ago`;
+}
+loadAnnouncements()
