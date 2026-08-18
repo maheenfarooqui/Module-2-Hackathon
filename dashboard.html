@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QuadPulse - Campus Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/notification.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
     <!-- Google Fonts Embed Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -127,10 +128,31 @@
 
         <!-- Right User Actions -->
         <div class="user-actions">
-          <button class="notif-btn" title="Notifications">
+          <!-- <button class="notif-btn" title="Notifications">
             <i class="fa-solid fa-bell"></i>
             <span class="notif-badge"></span>
-          </button>
+          </button> -->
+          <div class="notification-wrapper" style="position: relative">
+            <button
+              class="bell-btn"
+              id="bellIcon"
+              onclick="toggleNotificationDropdown()"
+              title="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span class="notif-badge" id="unreadBadge">0</span>
+            </button>
+
+            <div class="notification-dropdown" id="notifDropdown">
+              <div class="notif-header">
+                <h4>Notifications</h4>
+                <span class="mark-read-link" onclick="markAllAsRead()"
+                  >Mark all as read</span
+                >
+              </div>
+              <div class="notif-list" id="notifList"></div>
+            </div>
+          </div>
 
           <!-- User Profile Dropdown -->
           <div class="profile-dropdown-wrapper">
@@ -284,7 +306,7 @@
         </div>
 
         <!-- RIGHT COLUMN: NOTIFICATIONS SIDEBAR -->
-        <div class="right-column">
+        <!-- <div class="right-column">
           <section class="section-card notifications-card">
             <div class="card-header">
               <h2><i class="fa-solid fa-bell"></i> Notifications</h2>
@@ -331,14 +353,16 @@
               </div>
             </div>
           </section>
-        </div>
+        </div> -->
       </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/animation.js"></script>
+    <script src="js/notification.js"></script>
     <script src="js/dashboard.js" type="module"></script>
   </body>
 </html>
