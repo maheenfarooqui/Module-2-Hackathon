@@ -44,12 +44,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .bell-btn {
-  background: var(--bg-input);
-  border: 1px solid var(--border-glass);
+  border: none; 
+  background: none;
   color: var(--accent-cyan); 
   width: 44px; 
   height: 44px; 
-  border-radius: var(--sharp-border);
+ 
   cursor: pointer; 
   position: relative; 
   font-size: 18px;
@@ -79,12 +79,12 @@ h1, h2, h3, h4, h5, h6 {
   padding: 15px;
   display: none; 
   opacity: 0; 
-  z-index: 500;
+  z-index: 999999;
   background: var(--bg-card);
   border: 1px solid var(--accent-teal);
 }
 
-.notification-dropdown.active { display: block; }
+.notification-dropdown.active { display: block;opacity: 1; }
 
 .notif-header {
   display: flex; 

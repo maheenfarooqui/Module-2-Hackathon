@@ -5,119 +5,157 @@ const supbaseKey = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
 const { createClient } = window.supabase;
 const _supabase = createClient(supbaseUrl, supbaseKey);
 
-const currentUserId = "user_123";
+let currentUserId = null;
 let notifications = [];
 
-// 2. INITIAL LOAD
-document.addEventListener("DOMContentLoaded", () => {
-  fetchNotificationsFromSupabase();
+// 2. INITIAL LOAD & AUTH CHECK
+document.addEventListener("DOMContentLoaded", async () => {
+  // Get Current Logged-in User
+  const {
+    data: { user },
+  } = await _supabase.auth.getUser();
+  if (user) {
+    currentUserId = user.id;
+    await fetchNotificationsFromSupabase();
+    setupRealtimeNotifications();
+  }
 });
 
 // 3. FETCH NOTIFICATIONS FROM SUPABASE
 async function fetchNotificationsFromSupabase() {
+  if (!currentUserId) return;
+
   try {
     const { data, error } = await _supabase
-      .from('notifications')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("notifications")
+      .select("*")
+      .or(`user_id.eq.${currentUserId},user_id.is.null`) // Specific user or broadcast
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    if (data && data.length > 0) {
-      notifications = data.map(item => ({
-        id: item.id,
-        type: item.type,
-        text: item.message || item.text,
-        time: formatTimeAgo(item.created_at),
-        unread: item.is_read === false,
-        icon: getNotificationIcon(item.type)
-      }));
-    } else {
-      // Fallback Data if DB is empty
-      notifications = [
-        { id: 1, type: 'like', text: '<b>Sarah</b> liked your post.', time: '2 mins ago', unread: true, icon: 'fa-heart' },
-        { id: 2, type: 'comment', text: '<b>Ali</b> commented on your post.', time: '10 mins ago', unread: true, icon: 'fa-comment' },
-        { id: 3, type: 'event', text: '<b>Hamza</b> joined your coding event.', time: '1 hour ago', unread: true, icon: 'fa-calendar-check' }
-      ];
-    }
+    notifications = (data || []).map((item) => ({
+      id: item.id,
+      type: item.type,
+      text: item.message || item.text,
+      time: formatTimeAgo(item.created_at),
+      unread: item.is_read === false,
+      icon: getNotificationIcon(item.type),
+    }));
 
     renderNotifications();
   } catch (err) {
     console.warn("Supabase Fetch Warning:", err.message);
-    renderNotifications();
   }
 }
 
-// 4. RENDER NOTIFICATIONS
+// 4. LISTEN FOR REAL-TIME NOTIFICATIONS
+function setupRealtimeNotifications() {
+  _supabase
+    .channel("public:notifications")
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications",
+      },
+      (payload) => {
+        const newNotif = payload.new;
+        if (!newNotif.user_id || newNotif.user_id === currentUserId) {
+          notifications.unshift({
+            id: newNotif.id,
+            type: newNotif.type,
+            text: newNotif.message || newNotif.text,
+            time: "Just now",
+            unread: true,
+            icon: getNotificationIcon(newNotif.type),
+          });
+          renderNotifications();
+
+          // Bell Icon Shake Effect
+          const bell = document.getElementById("bellIcon");
+          if (bell) {
+            bell.classList.add("shake-animation");
+            setTimeout(() => bell.classList.remove("shake-animation"), 1000);
+          }
+        }
+      },
+    )
+    .subscribe();
+}
+
+// 5. RENDER NOTIFICATIONS
 function renderNotifications() {
   const list = document.getElementById("notifList");
   const pageList = document.getElementById("pageNotifList");
+  const dashboardList = document.querySelector(
+    ".right-column .notification-list",
+  );
   const unreadBadge = document.getElementById("unreadBadge");
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = notifications.filter((n) => n.unread).length;
 
   if (unreadBadge) {
     unreadBadge.innerText = unreadCount;
-    unreadBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+    unreadBadge.style.display = unreadCount > 0 ? "inline-block" : "none";
   }
 
-  const listHTML = notifications.map(n => `
-    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markSingleAsRead('${n.id}')">
-      <div class="notif-icon"><i class="fa-solid ${n.icon}"></i></div>
-      <div style="flex: 1;">
-        <div class="notif-text">${n.text}</div>
-        <span class="notif-time">${n.time}</span>
-      </div>
-    </div>
-  `).join("");
+  const listHTML =
+    notifications.length > 0
+      ? notifications
+          .map(
+            (n) => `
+        <div class="notif-item ${n.unread ? "unread" : ""}" onclick="markSingleAsRead('${n.id}')">
+          <div class="notif-icon"><i class="fa-solid ${n.icon}"></i></div>
+          <div style="flex: 1;">
+            <div class="notif-text">${n.text}</div>
+            <span class="notif-time" style="font-size:0.75rem; color:#94a3b8;">${n.time}</span>
+          </div>
+        </div>
+      `,
+          )
+          .join("")
+      : `<div style="padding: 15px; text-align: center; color: #94a3b8;">No notifications yet.</div>`;
 
   if (list) list.innerHTML = listHTML;
   if (pageList) pageList.innerHTML = listHTML;
+  if (dashboardList) dashboardList.innerHTML = listHTML;
 }
 
-// 5. TOGGLE DROPDOWN
 function toggleNotificationDropdown() {
   const dropdown = document.getElementById("notifDropdown");
   if (!dropdown) return;
-
-  const isActive = dropdown.classList.contains("active");
-
-  if (!isActive) {
-    dropdown.classList.add("active");
-    if (typeof animateBellRing === "function") animateBellRing();
-    if (typeof animateDropdownOpen === "function") animateDropdownOpen();
-  } else {
-    dropdown.classList.remove("active");
-  }
+  dropdown.classList.toggle("active");
 }
 
-// 6. MARK ALL AS READ
+// 7. MARK ALL AS READ
 async function markAllAsRead() {
-  notifications.forEach(n => n.unread = false);
+  notifications.forEach((n) => (n.unread = false));
   renderNotifications();
 
   try {
     await _supabase
-      .from('notifications')
+      .from("notifications")
       .update({ is_read: true })
-      .eq('user_id', currentUserId);
+      .eq("user_id", currentUserId);
   } catch (err) {
     console.error("Supabase Error:", err.message);
   }
 }
 
-// 7. MARK SINGLE AS READ
+// 8. MARK SINGLE AS READ
 async function markSingleAsRead(id) {
-  const notif = notifications.find(n => n.id == id);
+  const notif = notifications.find((n) => n.id == id);
   if (notif && notif.unread) {
     notif.unread = false;
     renderNotifications();
 
     try {
       await _supabase
-        .from('notifications')
+        .from("notifications")
         .update({ is_read: true })
-        .eq('id', id);
+        .eq("id", id);
     } catch (err) {
       console.error("Supabase Error:", err.message);
     }
@@ -127,22 +165,30 @@ async function markSingleAsRead(id) {
 // HELPER FUNCTIONS
 function getNotificationIcon(type) {
   switch (type) {
-    case 'like': return 'fa-heart';
-    case 'comment': return 'fa-comment';
-    case 'event': return 'fa-calendar-check';
-    case 'post': return 'fa-pen-to-square';
-    case 'announcement': return 'fa-bullhorn';
-    default: return 'fa-bell';
+    case "like":
+      return "fa-heart";
+    case "comment":
+      return "fa-comment";
+    case "event":
+      return "fa-calendar-check";
+    case "post":
+      return "fa-pen-to-square";
+    case "poll":
+      return "fa-chart-simple";
+    case "announcement":
+      return "fa-bullhorn";
+    default:
+      return "fa-bell";
   }
 }
 
 function formatTimeAgo(dateString) {
-  if (!dateString) return 'Just now';
+  if (!dateString) return "Just now";
   const date = new Date(dateString);
   const now = new Date();
   const seconds = Math.floor((now - date) / 1000);
 
-  if (seconds < 60) return 'Just now';
+  if (seconds < 60) return "Just now";
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes} mins ago`;
   const hours = Math.floor(minutes / 60);

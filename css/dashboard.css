@@ -148,7 +148,7 @@
   gap: 0.6rem;
   cursor: pointer;
   padding: 0.2rem 0.4rem;
-  border-radius: 20px;
+  border-radius: 0px;
   transition: background 0.2s ease;
 }
 
@@ -325,6 +325,10 @@ body {
 }
 
 /* QUICK ACTION BUTTONS + HOVER */
+.quick-actions a.btn {
+  text-decoration: none;
+
+}
 .quick-actions {
   display: flex;
   gap: 0.75rem;
@@ -370,7 +374,6 @@ body {
 /* GRID LAYOUT */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
 }
 
