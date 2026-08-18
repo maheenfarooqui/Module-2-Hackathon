@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Module 4 Hakathone</title>
+    <title>QuadPulse - Campus Dashboard</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
     <!-- Google Fonts Embed Code -->
@@ -20,14 +20,325 @@
     />
   </head>
   <body>
-    <main id="particle-container">
-       <h1 class="typewriter-text">
-  <span id="text"></span><span class="cursor">|</span>
-</h1>
+    <!-- HEADER NAVBAR -->
+    <header class="navbar">
+      <div class="nav-container">
+        <!-- Brand Logo -->
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-logo" id="authLogo">
+            <!-- QUADPULSE MINIMAL Q+P SVG LOGO -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
+              width="42"
+              height="42"
+              fill="none"
+            >
+              <defs>
+                <!-- Cyan to Dark Teal Gradient -->
+                <linearGradient
+                  id="qpGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stop-color="#72f2eb" />
+                  <stop offset="100%" stop-color="#0e8388" />
+                </linearGradient>
+
+                <!-- Neon Glow Effect -->
+                <filter
+                  id="qpGlow"
+                  x="-20%"
+                  y="-20%"
+                  width="140%"
+                  height="140%"
+                >
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Hexagonal Dark Border Frame -->
+              <path
+                d="M50 8 L88 30 L88 70 L50 92 L12 70 L12 30 Z"
+                stroke="rgba(114, 242, 235, 0.25)"
+                stroke-width="2.5"
+                fill="rgba(5, 22, 24, 0.6)"
+              />
+
+              <!-- Integrated "Q" + "P" Minimalist Cyber Path -->
+              <!-- "Q" Outer Circle & Tail -->
+              <path
+                d="M50 24 C35 24 25 35 25 50 C25 65 35 76 50 76 C65 76 75 65 75 50 C75 35 65 24 50 24 Z"
+                stroke="url(#qpGradient)"
+                stroke-width="5"
+                stroke-linecap="round"
+              />
+
+              <!-- "P" Vertical Stem & Loop Blend -->
+              <path
+                d="M38 34 L38 68"
+                stroke="#72f2eb"
+                stroke-width="5"
+                stroke-linecap="round"
+                filter="url(#qpGlow)"
+              />
+
+              <path
+                d="M38 34 C50 30 62 38 62 48 C62 58 50 62 38 62"
+                stroke="url(#qpGradient)"
+                stroke-width="4.5"
+                stroke-linecap="round"
+                fill="none"
+              />
+
+              <!-- "Q" Pulse Accent Tail -->
+              <path
+                d="M58 58 L72 72"
+                stroke="#72f2eb"
+                stroke-width="5"
+                stroke-linecap="round"
+                filter="url(#qpGlow)"
+              />
+
+              <!-- Pulse Center Glow Node -->
+              <circle
+                cx="50"
+                cy="50"
+                r="3.5"
+                fill="#72f2eb"
+                filter="url(#qpGlow)"
+              />
+            </svg>
+            <span class="logo-text">Quad<span>Pulse</span></span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="nav-menu" id="navMenu">
+          <a href="dashboard.html" class="nav-link active">Dashboard</a>
+          <a href="communitypost.html" class="nav-link">Posts</a>
+          <a href="event.html" class="nav-link">Events</a>
+          <a href="studypartnerfinder.html" class="nav-link">Study Partners</a>
+          <a href="poll.html" class="nav-link">Polls</a>
+        </nav>
+
+        <!-- Right User Actions -->
+        <div class="user-actions">
+          <button class="notif-btn" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-badge"></span>
+          </button>
+
+          <!-- User Profile Dropdown -->
+          <div class="profile-dropdown-wrapper">
+            <div class="user-profile-trigger" id="profileTrigger">
+              <div class="avatar-circle" id="avatarCircle">
+                <span id="avatarInitials">AH</span>
+                <img
+                  id="avatarImage"
+                  src=""
+                  alt="Profile"
+                  class="avatar-img hidden"
+                />
+              </div>
+              <span class="user-name" id="userNameDisplay">Ali Hassan</span>
+              <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="dropdown-menu" id="profileDropdown">
+              <label for="profilePicInput" class="dropdown-item">
+                <i class="fa-solid fa-camera"></i>
+                <span>Upload Profile Picture</span>
+                <input
+                  type="file"
+                  id="profilePicInput"
+                  accept="image/*"
+                  class="hidden-input"
+                />
+              </label>
+              <a href="userDashboard.html" class="dropdown-item">
+                <i class="fa-solid fa-gauge"></i>
+                <span>Go to Your Dashboard</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item logout-item" id="logoutBtn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Menu Hamburger -->
+          <button class="mobile-toggle" id="mobileToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <!-- WELCOME BANNER & QUICK ACTIONS -->
+      <section class="welcome-section">
+        <div class="welcome-text">
+          <h1>Welcome back, <span id="welcomeUserName">Ali Hassan</span> 👋</h1>
+          <p>Here is what is happening across your campus community today.</p>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="quick-actions">
+          <a href="communitypost.html" class="btn btn-action">
+            <i class="fa-solid fa-pen-to-square"></i> Create Post
+          </a>
+          <a href="event.html" class="btn btn-action">
+            <i class="fa-solid fa-calendar-plus"></i> Create Event
+          </a>
+          <a href="studypartnerfinder.html" class="btn btn-action btn-accent">
+            <i class="fa-solid fa-user-group"></i> Find Study Partner
+          </a>
+        </div>
+      </section>
+
+      <!-- DASHBOARD GRID LAYOUT -->
+      <div class="dashboard-grid">
+        <!-- LEFT COLUMN: STATS, ANNOUNCEMENTS & EVENTS -->
+        <div class="left-column">
+          <!-- Stats Overview Bar -->
+          <div class="stats-container">
+            <!-- Total Posts -->
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="totalPostsCount">0</span>
+                <span class="stat-label">Total Posts</span>
+              </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fa-solid fa-calendar-check"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value" id="upcomingEventsCount">0</span>
+                <span class="stat-label">Events</span>
+              </div>
+            </div>
+
+            <!-- Announcements (Static ya Future Table ke liye) -->
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
+              <div class="stat-info">
+                <span class="stat-value" id="announcementsCount">03</span>
+                <span class="stat-label">Announcements</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest Announcements Section -->
+          <section class="section-card">
+            <div class="card-header">
+              <h2><i class="fa-solid fa-bullhorn"></i> Latest Announcements</h2>
+              <a href="#" class="view-all-link">View All</a>
+            </div>
+            <div class="announcement-list">
+              <div class="announcement-item priority-high">
+                <span class="tag">Urgent</span>
+                <h3>Mid-Term Exam Schedule Released</h3>
+                <p>
+                  The updated timetable for Fall 2026 mid-term examinations is
+                  now live on the portal.
+                </p>
+                <span class="time-stamp">2 hours ago</span>
+              </div>
+              <div class="announcement-item">
+                <span class="tag">Campus Life</span>
+                <h3>Annual Tech Hackathon Registration Open</h3>
+                <p>
+                  Form your teams of 4 and register before August 30 to
+                  participate in QuadPulse Hack 2026.
+                </p>
+                <span class="time-stamp">Yesterday</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Upcoming Events Section -->
+          <section class="section-card">
+            <div class="card-header">
+              <h2><i class="fa-solid fa-calendar-days"></i> Upcoming Events</h2>
+              <a href="event.html" class="view-all-link">View All</a>
+            </div>
+            <div class="events-mini-grid" id="eventsMiniGrid">
+              <!-- Dynamic Supabase Events Yahan Render Honge -->
+              <p style="color: #94a3b8; font-size: 0.85rem">
+                Loading events...
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT COLUMN: NOTIFICATIONS SIDEBAR -->
+        <div class="right-column">
+          <section class="section-card notifications-card">
+            <div class="card-header">
+              <h2><i class="fa-solid fa-bell"></i> Notifications</h2>
+              <button class="mark-read-btn">Mark all as read</button>
+            </div>
+            <div class="notification-list">
+              <div class="notif-item unread">
+                <div class="notif-avatar">
+                  <i class="fa-solid fa-comment-dots"></i>
+                </div>
+                <div class="notif-text">
+                  <p>
+                    <strong>Sara Ahmed</strong> commented on your study group
+                    request.
+                  </p>
+                  <span class="time-stamp">10 mins ago</span>
+                </div>
+              </div>
+
+              <div class="notif-item unread">
+                <div class="notif-avatar">
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="notif-text">
+                  <p>
+                    <strong>Zainab Malik</strong> invited you to join
+                    <strong>Web Dev Group</strong>.
+                  </p>
+                  <span class="time-stamp">1 hour ago</span>
+                </div>
+              </div>
+
+              <div class="notif-item">
+                <div class="notif-avatar">
+                  <i class="fa-solid fa-thumbs-up"></i>
+                </div>
+                <div class="notif-text">
+                  <p>
+                    Your post <strong>"GSAP Animation Tips"</strong> got 15 new
+                    likes.
+                  </p>
+                  <span class="time-stamp">3 hours ago</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
     </main>
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
     <script src="js/animation.js"></script>
+    <script src="js/dashboard.js" type="module"></script>
   </body>
 </html>

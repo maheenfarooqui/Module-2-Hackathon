@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+
+  <!-- Fonts used by the theme -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Theme CSS -->
+  <link rel="stylesheet" href="css/communitpost.css" />
+</head>
+<body>
+
+   <!-- HEADER NAVBAR -->
+    <header class="navbar">
+      <div class="nav-container">
+        <!-- Brand Logo -->
+        <a href="#" class="brand-logo">
+  <div class="brand-logo" id="authLogo">
+            <!-- QUADPULSE MINIMAL Q+P SVG LOGO -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="42" height="42" fill="none">
+  <defs>
+    <!-- Cyan to Dark Teal Gradient -->
+    <linearGradient id="qpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#72f2eb" />
+      <stop offset="100%" stop-color="#0e8388" />
+    </linearGradient>
+
+    <!-- Neon Glow Effect -->
+    <filter id="qpGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Hexagonal Dark Border Frame -->
+  <path d="M50 8 L88 30 L88 70 L50 92 L12 70 L12 30 Z" 
+        stroke="rgba(114, 242, 235, 0.25)" 
+        stroke-width="2.5" 
+        fill="rgba(5, 22, 24, 0.6)" />
+
+  <!-- Integrated "Q" + "P" Minimalist Cyber Path -->
+  <!-- "Q" Outer Circle & Tail -->
+  <path d="M50 24 C35 24 25 35 25 50 C25 65 35 76 50 76 C65 76 75 65 75 50 C75 35 65 24 50 24 Z" 
+        stroke="url(#qpGradient)" 
+        stroke-width="5" 
+        stroke-linecap="round" />
+  
+  <!-- "P" Vertical Stem & Loop Blend -->
+  <path d="M38 34 L38 68" 
+        stroke="#72f2eb" 
+        stroke-width="5" 
+        stroke-linecap="round" 
+        filter="url(#qpGlow)" />
+  
+  <path d="M38 34 C50 30 62 38 62 48 C62 58 50 62 38 62" 
+        stroke="url(#qpGradient)" 
+        stroke-width="4.5" 
+        stroke-linecap="round" 
+        fill="none" />
+
+  <!-- "Q" Pulse Accent Tail -->
+  <path d="M58 58 L72 72" 
+        stroke="#72f2eb" 
+        stroke-width="5" 
+        stroke-linecap="round" 
+        filter="url(#qpGlow)" />
+
+  <!-- Pulse Center Glow Node -->
+  <circle cx="50" cy="50" r="3.5" fill="#72f2eb" filter="url(#qpGlow)" />
+</svg>
+<span class="logo-text">Quad<span>Pulse</span></span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="nav-menu" id="navMenu">
+          <a href="dashboard.html" class="nav-link active">Dashboard</a>
+          <a href="communitypost.html" class="nav-link">Posts</a>
+          <a href="event.html" class="nav-link">Events</a>
+          <a href="studypartnerfinder.html" class="nav-link">Study Partners</a>
+          <a href="#" class="nav-link">Polls</a>
+        </nav>
+
+        <!-- Right User Actions -->
+        <div class="user-actions">
+          <button class="notif-btn" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-badge"></span>
+          </button>
+
+          <!-- User Profile Dropdown -->
+          <div class="profile-dropdown-wrapper">
+            <div class="user-profile-trigger" id="profileTrigger">
+              <div class="avatar-circle" id="avatarCircle">
+                <span id="avatarInitials">AH</span>
+                <img id="avatarImage" src="" alt="Profile" class="avatar-img hidden" />
+              </div>
+              <span class="user-name" id="userNameDisplay">Ali Hassan</span>
+              <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="dropdown-menu" id="profileDropdown">
+              <label for="profilePicInput" class="dropdown-item">
+                <i class="fa-solid fa-camera"></i>
+                <span>Upload Profile Picture</span>
+                <input type="file" id="profilePicInput" accept="image/*" class="hidden-input" />
+              </label>
+              <a href="#" class="dropdown-item">
+                <i class="fa-solid fa-gauge"></i>
+                <span>Go to Your Dashboard</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item logout-item" id="logoutBtn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Menu Hamburger -->
+          <button class="mobile-toggle" id="mobileToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+  <div id="particle-container"></div>
+  <div class="mainapp">
+    <nav
+      class="navbar navbar-expand-lg border-bottom border-secondary sticky-top bgdark py-3"
+    >
+      <div class="container">
+        <div class="row w-100 align-items-center g-0">
+          <div
+            class="col-3 d-flex justify-content-start align-items-center"
+            id="mylogoAnim"
+          >
+          
+          </div>
+          <div class="col-6 d-flex justify-content-center">
+            <div
+              class="input-group style-search-group"
+              style="max-width: 400px; width: 100%"
+              id="searchAnim"
+            >
+              <input
+                type="search"
+                id="searchPost"
+                class="form-control custom-i"
+                placeholder="Search..."
+                style="
+                  border-top-right-radius: 0 !important;
+                  border-bottom-right-radius: 0 !important;
+                "
+              />
+              <button
+                class="btn custom-i border-start-0"
+                type="button"
+                onclick="searchPost()"
+                style="
+                  border-top-left-radius: 0 !important;
+                  border-bottom-left-radius: 0 !important;
+                  color: #6f7a8d;
+                "
+              >
+                <i class="fas fa-search hover-cyan"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-3 d-flex justify-content-end align-items-center">
+            <div class="dropdown" id="iconAnim">
+              <div
+                class="user-profile-circle shadow-cyan dropdown-toggle"
+                id="icon"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              ></div>
+              <ul
+                id="dropdownMenu"
+                class="dropdown-menu dropdown-menu-end border border-secondary shadow-lg"
+                aria-labelledby="icon"
+                style="
+                  background-color: #1e293b;
+                  border-radius: 5px;
+                  min-width: 80px;
+                  margin-top: 3px;
+                "
+              >
+                <li>
+                  <button
+                    class="dropdown-item btn text-center text-light hover-cyan d-flex align-items-center"
+                    onclick="logout()"
+                    style="
+                      font-size: 0.9rem;
+                      font-family: 'Inter', sans-serif;
+                      background: transparent;
+                      transition: 0.3s;
+                    "
+                  >
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="roundaerro">
+      <i id="arrow" class="fa-solid fa-arrow-up-long"></i>
+    </div>
+    <div class="container mt-lg-5 d-flex flex-column">
+      <div class="custom-toggle-wrapper mb-4 ms-auto">
+        <span class="toggle-text-label">All Feed</span>
+        <label class="theme-switch-capsule">
+          <input type="checkbox" id="myPostsToggle" />
+          <span class="theme-slider"></span>
+        </label>
+        <span class="toggle-text-label active-cyan">My Posts</span>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="postCard p-4 shadow-sm sticky-lg-top" style="top: 100px">
+            <h5 class="text-white mb-4 fw-bold">Share Your Vibe</h5>
+            <form id="post-form">
+              <div class="mb-3">
+                <input
+                  type="text"
+                  id="title"
+                  class="form-control custom-input"
+                  placeholder="Post Title"
+                />
+              </div>
+              <div class="mb-3">
+                <textarea
+                  id="body"
+                  rows="4"
+                  class="form-control custom-input"
+                  placeholder="What's on your mind?"
+                ></textarea>
+              </div>
+              <div class="mb-3 imgContainer">
+                <label class="btn-upload-cyan" for="imgInput">
+                  <i class="fas fa-image"></i> Upload Image
+                </label>
+                <input
+                  type="file"
+                  id="imgInput"
+                  class="hide-input"
+                  accept="image/*"
+                />
+                <img
+                  class="card-img-top bgimg mt-3"
+                  id="previewImg"
+                  style="display: none"
+                />
+              </div>
+              <button
+                type="button"
+                id="upBtn"
+                onclick="sumbitPost()"
+                class="btn btn-cyan w-100 fw-bold py-2 shadow-sm svg-btn"
+              >
+                <span class="btn-text">Post Now</span>
+                <!-- SVG Border Overlay -->
+                <svg
+                  class="btn-svg"
+                  viewBox="0 0 180 60"
+                  preserveAspectRatio="none"
+                >
+                  <polyline
+                    points="179,1 179,59 1,59 1,1 179,1"
+                    class="bg-line"
+                  />
+                  <polyline
+                    points="179,1 179,59 1,59 1,1 179,1"
+                    class="hl-line"
+                  />
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <h5 class="text-white mb-4 fw-bold">Recent Feeds</h5>
+          <div id="post" class="post-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- App logic (Supabase, posts, likes, comments) -->
+  <script src="js/communitypost/communitypost.js"></script>
+  <!-- Animations only (GSAP) -->
+  <script src="js/communitypost/communityAnimation.js"></script>
+</body>
+</html>

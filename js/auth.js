@@ -32,7 +32,7 @@ if (signUpBtn) {
     const userP = document.getElementById("userPass").value.trim();
     const userE = document.getElementById("userEmail").value.trim();
     const userN = document.getElementById("userName").value.trim();
-    
+
     if (!userE || !userP) {
       Swal.fire({
         icon: "error",
@@ -49,9 +49,9 @@ if (signUpBtn) {
         password: userP,
         options: {
           data: {
-            first_name: userN,
+            full_name: userN,
             email: userE,
-            role: "user"
+            role: "user",
           },
         },
       });
@@ -75,8 +75,6 @@ if (signUpBtn) {
         showConfirmButton: false,
       }).then(() => {
         window.location.href = "dashboard.html";
-     
-        
       });
     } catch (error) {
       console.log(error.message);
@@ -179,7 +177,6 @@ if (logInBtn) {
 
 // for index file
 document.addEventListener("DOMContentLoaded", () => {
-
   gsap.registerPlugin(TextPlugin, ScrollTrigger);
 
   const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -187,4 +184,5 @@ document.addEventListener("DOMContentLoaded", () => {
   tl.from("#authHeader, #authLogo", {
     yPercent: -100,
     duration: 0.8,
-  })})
+  });
+});
