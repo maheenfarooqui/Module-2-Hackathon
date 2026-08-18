@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
+
+    <link rel="stylesheet" href="css/userDashboard.css" />
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-wrapper">
+      <!-- LEFT SIDEBAR -->
+     
+<aside class="sidebar">
+  <a href="admin-dashboard.html" class="brand-logo">
+    <!-- QUADPULSE MINIMAL Q+P SVG LOGO -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 100 100"
+      width="42"
+      height="42"
+      fill="none"
+    >
+      <defs>
+        <linearGradient
+          id="qpGradient"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="100%"
+        >
+          <stop offset="0%" stop-color="#72f2eb" />
+          <stop offset="100%" stop-color="#0e8388" />
+        </linearGradient>
+
+        <filter
+          id="qpGlow"
+          x="-20%"
+          y="-20%"
+          width="140%"
+          height="140%"
+        >
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+
+      <path
+        d="M50 8 L88 30 L88 70 L50 92 L12 70 L12 30 Z"
+        stroke="rgba(114, 242, 235, 0.25)"
+        stroke-width="2.5"
+        fill="rgba(5, 22, 24, 0.6)"
+      />
+
+      <path
+        d="M50 24 C35 24 25 35 25 50 C25 65 35 76 50 76 C65 76 75 65 75 50 C75 35 65 24 50 24 Z"
+        stroke="url(#qpGradient)"
+        stroke-width="5"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M38 34 L38 68"
+        stroke="#72f2eb"
+        stroke-width="5"
+        stroke-linecap="round"
+        filter="url(#qpGlow)"
+      />
+
+      <path
+        d="M38 34 C50 30 62 38 62 48 C62 58 50 62 38 62"
+        stroke="url(#qpGradient)"
+        stroke-width="4.5"
+        stroke-linecap="round"
+        fill="none"
+      />
+
+      <path
+        d="M58 58 L72 72"
+        stroke="#72f2eb"
+        stroke-width="5"
+        stroke-linecap="round"
+        filter="url(#qpGlow)"
+      />
+
+      <circle
+        cx="50"
+        cy="50"
+        r="3.5"
+        fill="#72f2eb"
+        filter="url(#qpGlow)"
+      />
+    </svg>
+    <span class="logo-text">Quad<span>Pulse</span></span>
+  </a>
+
+  <nav class="sidebar-nav">
+    <ul>
+      <li>
+        <a href="#dashboard-section" class="nav-link active">
+          <i class="fa-solid fa-chart-line"></i> <span>Dashboard Stats</span>
+        </a>
+      </li>
+      <li>
+        <a href="#users-section" class="nav-link">
+          <i class="fa-solid fa-users"></i> <span>User Management</span>
+        </a>
+      </li>
+      <li>
+        <a href="#posts-section" class="nav-link">
+          <i class="fa-solid fa-file-lines"></i> <span>Manage Posts</span>
+        </a>
+      </li>
+      <li>
+        <a href="#events-section" class="nav-link">
+          <i class="fa-solid fa-calendar-check"></i> <span>Manage Events</span>
+        </a>
+      </li>
+      <li>
+        <a href="#announcements-section" class="nav-link">
+          <i class="fa-solid fa-bullhorn"></i> <span>Announcements</span>
+        </a>
+      </li>
+      <li>
+        <a href="#reports-section" class="nav-link">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span>Reports</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="logout-btn" onclick="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+    </span>
+  </div>
+</aside>
+      <main class="main-content">
+  <!-- TOP WELCOME BAR WITH QUICK ADMIN ACTIONS -->
+  <header class="top-welcome-bar">
+    <div class="user-greeting" id="adminWelcome">
+      <h1>Admin Dashboard 👋</h1>
+      <p>Overview of campus operations, system metrics, and moderation controls.</p>
+    </div>
+
+    <div class="quick-actions">
+      <a href="manage-users.html" class="btn btn-action">
+        <i class="fa-solid fa-user-gear"></i> Manage Users
+      </a>
+      <a href="moderation-queue.html" class="btn btn-action">
+        <i class="fa-solid fa-shield-halved"></i> Moderation Queue
+      </a>
+      <a href="announcements.html" class="btn btn-action btn-accent">
+        <i class="fa-solid fa-bullhorn"></i> Post Announcement
+      </a>
+    </div>
+  </header>
+
+ <div class="stats-container">
+  <!-- Total Active Users -->
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+    <div class="stat-info">
+      <span class="stat-value" id="totalUsersCount">0</span>
+      <span class="stat-label">Total Users</span>
+    </div>
+  </div>
+
+  <!-- Total Posts -->
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+    <div class="stat-info">
+      <span class="stat-value" id="totalPostsCount">0</span>
+      <span class="stat-label">Total Posts</span>
+    </div>
+  </div>
+
+  <!-- Total Events -->
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+    <div class="stat-info">
+      <span class="stat-value" id="totalEventsCount">0</span>
+      <span class="stat-label">Total Events</span>
+    </div>
+  </div>
+
+  <!-- Study Partners Requests -->
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-handshake"></i></div>
+    <div class="stat-info">
+      <span class="stat-value" id="studyPartnersCount">0</span>
+      <span class="stat-label">Study Partners</span>
+    </div>
+  </div>
+
+  <!-- Total Comments -->
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-comments"></i></div>
+    <div class="stat-info">
+      <span class="stat-value" id="totalCommentsCount">0</span>
+      <span class="stat-label">Total Comments</span>
+    </div>
+  </div>
+
+  <!-- Total Likes -->
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fa-solid fa-heart"></i></div>
+    <div class="stat-info">
+      <span class="stat-value" id="totalLikesCount">0</span>
+      <span class="stat-label">Total Likes</span>
+    </div>
+  </div>
+</div>
+
+  <!-- CONTENT GRID -->
+  <div class="content-grid">
+    <!-- LEFT COLUMN: RECENT POSTS & MODERATION TABLE -->
+    <div class="grid-main">
+      <!-- PENDING MODERATION QUEUE -->
+      <section class="dashboard-card" id="moderationQueueCard">
+        <div class="card-title">
+          <h2><i class="fa-solid fa-shield-halved"></i> Pending Content Moderation</h2>
+        </div>
+
+        <div class="post-list" id="adminModerationList">
+          <p style="color: #94a3b8; font-size: 0.85rem; padding: 12px">
+            Loading flagged posts & comments...
+          </p>
+        </div>
+      </section>
+
+      <!-- RECENT USER ACTIVITIES / SYSTEM LOGS -->
+      <section class="dashboard-card" id="recentActivitiesCard">
+        <div class="card-title">
+          <h2><i class="fa-solid fa-list-check"></i> Recent Platform Activity</h2>
+        </div>
+
+        <div class="post-list" id="adminActivityLogs">
+          <p style="color: #94a3b8; font-size: 0.85rem; padding: 12px">
+            Loading recent logs...
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN: ANNOUNCEMENT MANAGEMENT & EVENT APPROVALS -->
+    <div class="grid-side">
+      <!-- BROADCAST ANNOUNCEMENT CARD -->
+      <section class="dashboard-card" id="broadcastCard">
+        <div class="card-title">
+          <h2><i class="fa-solid fa-bullhorn"></i> Global Announcement</h2>
+        </div>
+        
+        <form id="adminAnnouncementForm" style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px;">
+          <div class="form-group">
+            <label for="announcementTitle">Title</label>
+            <input type="text" id="announcementTitle" placeholder="e.g. Campus Closure Notice" required />
+          </div>
+
+          <div class="form-group">
+            <label for="announcementCategory">Category</label>
+            <select id="announcementCategory" style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px;">
+              <option value="Urgent">Urgent</option>
+              <option value="Campus">Campus</option>
+              <option value="Academic">Academic</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-action btn-accent" style="margin-top: 6px;">
+            Publish Announcement
+          </button>
+        </form>
+      </section>
+
+      <!-- EVENT APPROVAL REQUESTS -->
+      <section class="dashboard-card" id="eventApprovalsCard">
+        <div class="card-title">
+          <h2><i class="fa-solid fa-calendar-day"></i> Event Approvals</h2>
+        </div>
+        <div class="mini-list" id="pendingEventsList">
+          <p style="color: #94a3b8; font-size: 0.85rem; padding: 8px">
+            Loading event approval requests...
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="js/adminDashboard.js"></script>
+  </body>
+</html>

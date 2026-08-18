@@ -1,232 +1,319 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Dashboard</title>
-  <link rel="stylesheet" href="css/userDashboard.css">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
 
-  <div class="dashboard-wrapper">
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <h2><i class="fa-solid fa-cube"></i> Portal</h2>
-      </div>
+    <link rel="stylesheet" href="css/userDashboard.css" />
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="dashboard-wrapper">
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <a href="dashboard.html" class="brand-logo">
+          
+            <!-- QUADPULSE MINIMAL Q+P SVG LOGO -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
+              width="42"
+              height="42"
+              fill="none"
+            >
+              <defs>
+                <!-- Cyan to Dark Teal Gradient -->
+                <linearGradient
+                  id="qpGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stop-color="#72f2eb" />
+                  <stop offset="100%" stop-color="#0e8388" />
+                </linearGradient>
 
-      <nav class="sidebar-nav">
-        <ul>
-          <li>
-            <a href="#welcome" class="nav-link active">
-              <i class="fa-solid fa-house"></i> <span>Dashboard</span>
-            </a>
-          </li>
-          <li>
-            <a href="#profile" class="nav-link">
-              <i class="fa-solid fa-user-pen"></i> <span>Edit Profile</span>
-            </a>
-          </li>
-          <li>
-            <a href="#posts" class="nav-link">
-              <i class="fa-solid fa-file-lines"></i> <span>My Posts</span>
-            </a>
-          </li>
-          <li>
-            <a href="#events" class="nav-link">
-              <i class="fa-solid fa-calendar-days"></i> <span>Events & News</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+                <!-- Neon Glow Effect -->
+                <filter
+                  id="qpGlow"
+                  x="-20%"
+                  y="-20%"
+                  width="140%"
+                  height="140%"
+                >
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
 
-      <div class="sidebar-footer">
-        <a href="login.html" class="logout-btn">
-          <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
-        </a>
-      </div>
-    </aside>
+              <!-- Hexagonal Dark Border Frame -->
+              <path
+                d="M50 8 L88 30 L88 70 L50 92 L12 70 L12 30 Z"
+                stroke="rgba(114, 242, 235, 0.25)"
+                stroke-width="2.5"
+                fill="rgba(5, 22, 24, 0.6)"
+              />
 
-    <!-- RIGHT MAIN CONTENT AREA -->
-    <main class="main-content">
+              <!-- Integrated "Q" + "P" Minimalist Cyber Path -->
+              <!-- "Q" Outer Circle & Tail -->
+              <path
+                d="M50 24 C35 24 25 35 25 50 C25 65 35 76 50 76 C65 76 75 65 75 50 C75 35 65 24 50 24 Z"
+                stroke="url(#qpGradient)"
+                stroke-width="5"
+                stroke-linecap="round"
+              />
 
-      <!-- TOP WELCOME BAR WITH QUICK ACTIONS -->
-      <header class="top-welcome-bar">
-        <div class="user-greeting">
-          <h1>Welcome, <span id="dashUserName">Ali Hassan</span> 👋</h1>
-          <p>Manage your campus profile, posts, and activities.</p>
-        </div>
+              <!-- "P" Vertical Stem & Loop Blend -->
+              <path
+                d="M38 34 L38 68"
+                stroke="#72f2eb"
+                stroke-width="5"
+                stroke-linecap="round"
+                filter="url(#qpGlow)"
+              />
 
-        <div class="quick-actions">
-          <button class="btn btn-action">
-            <i class="fa-solid fa-pen-to-square"></i> Create Post
-          </button>
-          <button class="btn btn-action">
-            <i class="fa-solid fa-calendar-plus"></i> Create Event
-          </button>
-          <button class="btn btn-action btn-accent">
-            <i class="fa-solid fa-user-group"></i> Find Study Partner
-          </button>
-        </div>
-      </header>
+              <path
+                d="M38 34 C50 30 62 38 62 48 C62 58 50 62 38 62"
+                stroke="url(#qpGradient)"
+                stroke-width="4.5"
+                stroke-linecap="round"
+                fill="none"
+              />
 
-      <!-- STATS BAR -->
-      <section class="stats-container">
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">12</span>
-            <span class="stat-label">My Posts</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">04</span>
-            <span class="stat-label">Upcoming Events</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">03</span>
-            <span class="stat-label">Announcements</span>
-          </div>
-        </div>
-      </section>
+              <!-- "Q" Pulse Accent Tail -->
+              <path
+                d="M58 58 L72 72"
+                stroke="#72f2eb"
+                stroke-width="5"
+                stroke-linecap="round"
+                filter="url(#qpGlow)"
+              />
 
-      <!-- CONTENT GRID -->
-      <div class="content-grid">
+              <!-- Pulse Center Glow Node -->
+              <circle
+                cx="50"
+                cy="50"
+                r="3.5"
+                fill="#72f2eb"
+                filter="url(#qpGlow)"
+              />
+            </svg>
+            <span class="logo-text">Quad<span>Pulse</span></span>
         
-        <!-- LEFT COLUMN: EDIT PROFILE & MY POSTS -->
-        <div class="grid-main">
+        </a>
 
-          <!-- EDIT PROFILE FORM -->
-          <section class="dashboard-card" id="profile-section">
-            <div class="card-title">
-              <h2><i class="fa-solid fa-user-pen"></i> Edit Profile</h2>
-            </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="#welcome" class="nav-link active">
+                <i class="fa-solid fa-house"></i> <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="#profile" class="nav-link">
+                <i class="fa-solid fa-user-pen"></i> <span>Edit Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="#posts" class="nav-link">
+                <i class="fa-solid fa-file-lines"></i> <span>My Posts</span>
+              </a>
+            </li>
+            <li>
+              <a href="#events" class="nav-link">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Events & News</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
 
-            <form class="profile-form" onsubmit="event.preventDefault();">
-              <div class="avatar-upload">
-                <div class="avatar-preview">
-                  <i class="fa-solid fa-user"></i>
-                </div>
-                <div class="upload-btn-wrapper">
-                  <label for="avatarInput" class="btn btn-action">Change Picture</label>
-                  <input type="file" id="avatarInput" accept="image/*" hidden>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" value="Ali Hassan" placeholder="Enter full name">
-              </div>
-
-              <div class="form-group">
-                <label for="emailAddr">Email Address</label>
-                <input type="email" id="emailAddr" value="ali.hassan@example.com" placeholder="Enter email">
-              </div>
-
-              <button type="submit" class="btn btn-action btn-accent">Save Changes</button>
-            </form>
-          </section>
-
-          <!-- MY POSTS LIST -->
-          <section class="dashboard-card" id="posts-section">
-            <div class="card-title">
-              <h2><i class="fa-solid fa-file-lines"></i> My Recent Posts</h2>
-            </div>
-
-            <div class="post-list">
-              <div class="post-item">
-                <div class="post-header">
-                  <h3>GSAP ScrollTrigger Setup Guide</h3>
-                  <span class="post-date">Aug 15, 2026</span>
-                </div>
-                <p>Shared a full tutorial on how to combine GSAP animations with Tailwind CSS layouts smoothly.</p>
-                <div class="post-actions">
-                  <button class="action-link"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                  <button class="action-link delete"><i class="fa-solid fa-trash"></i> Delete</button>
-                </div>
-              </div>
-
-              <div class="post-item">
-                <div class="post-header">
-                  <h3>Looking for MERN Stack Study Partner</h3>
-                  <span class="post-date">Aug 10, 2026</span>
-                </div>
-                <p>Anyone working on Supabase authentication and Node API backends wants to collaborate?</p>
-                <div class="post-actions">
-                  <button class="action-link"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                  <button class="action-link delete"><i class="fa-solid fa-trash"></i> Delete</button>
-                </div>
-              </div>
-            </div>
-          </section>
-
+        <div class="sidebar-footer">
+          <span class="logout-btn" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+          </span>
         </div>
+      </aside>
 
-        <!-- RIGHT COLUMN: EVENTS & ANNOUNCEMENTS -->
-        <div class="grid-side">
+      <!-- RIGHT MAIN CONTENT AREA -->
+      <main class="main-content">
+        <!-- TOP WELCOME BAR WITH QUICK ACTIONS -->
+        <header class="top-welcome-bar">
+          <div class="user-greeting" id="welcome">
+            <h1>Welcome, <span id="welcomeUserName">Ali Hassan</span> 👋</h1>
+            <p>Manage your campus profile, posts, and activities.</p>
+          </div>
 
-          <!-- ANNOUNCEMENTS -->
-          <section class="dashboard-card">
-            <div class="card-title">
-              <h2><i class="fa-solid fa-bullhorn"></i> Announcements</h2>
+          <div class="quick-actions">
+            <a href="communitypost.html" class="btn btn-action">
+              <i class="fa-solid fa-pen-to-square"></i> Create Post
+            </a>
+            <a href="event.html" class="btn btn-action">
+              <i class="fa-solid fa-calendar-plus"></i> Create Event
+            </a>
+            <a href="studypartnerfinder.html" class="btn btn-action btn-accent">
+              <i class="fa-solid fa-user-group"></i> Find Study Partner
+            </a>
+          </div>
+        </header>
+
+        <!-- STATS BAR -->
+        <!-- <section class="stats-container">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+            <div class="stat-info">
+              <span class="stat-value">12</span>
+              <span class="stat-label">My Posts</span>
             </div>
-            <div class="mini-list">
-              <div class="mini-item priority">
-                <span class="tag">Urgent</span>
-                <h4>Mid-Term Exam Schedule Released</h4>
-                <span class="time-stamp">2 hours ago</span>
-              </div>
-              <div class="mini-item">
-                <span class="tag">Campus</span>
-                <h4>Hackathon 2026 Registrations Open</h4>
-                <span class="time-stamp">Yesterday</span>
-              </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa-solid fa-calendar-check"></i>
             </div>
-          </section>
-
-          <!-- UPCOMING EVENTS -->
-          <section class="dashboard-card">
-            <div class="card-title">
-              <h2><i class="fa-solid fa-calendar-days"></i> Upcoming Events</h2>
+            <div class="stat-info">
+              <span class="stat-value">04</span>
+              <span class="stat-label">Upcoming Events</span>
             </div>
-            <div class="mini-list">
-              <div class="event-item">
-                <div class="event-date">
-                  <span class="day">24</span>
-                  <span class="month">AUG</span>
-                </div>
-                <div class="event-info">
-                  <h4>Web Dev Workshop</h4>
-                  <p><i class="fa-solid fa-location-dot"></i> CS Lab 02</p>
-                </div>
-              </div>
-
-              <div class="event-item">
-                <div class="event-date">
-                  <span class="day">28</span>
-                  <span class="month">AUG</span>
-                </div>
-                <div class="event-info">
-                  <h4>AI & ML Seminar</h4>
-                  <p><i class="fa-solid fa-location-dot"></i> Main Auditorium</p>
-                </div>
-              </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="stat-info">
+              <span class="stat-value">03</span>
+              <span class="stat-label">Announcements</span>
             </div>
-          </section>
+          </div>
+        </section> -->
+        <div class="stats-container">
+          <!-- Total Posts -->
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalPostsCount">0</span>
+              <span class="stat-label">Total Posts</span>
+            </div>
+          </div>
 
+          <!-- Upcoming Events -->
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value" id="upcomingEventsCount">0</span>
+              <span class="stat-label">Events</span>
+            </div>
+          </div>
+
+          <!-- Announcements (Static ya Future Table ke liye) -->
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="announcementsCount">03</span>
+              <span class="stat-label">Announcements</span>
+            </div>
+          </div>
         </div>
-
-      </div>
-
-    </main>
+        <!-- CONTENT GRID -->
+        <div class="content-grid">
+          <!-- LEFT COLUMN: EDIT PROFILE & MY POSTS -->
+          <div class="grid-main">
+            <!-- EDIT PROFILE FORM -->
+<section class="dashboard-card" id="profile">
+  <div class="card-title">
+    <h2><i class="fa-solid fa-user-pen"></i> Edit Profile</h2>
   </div>
 
-</body>
+  <form class="profile-form" id="profileForm">
+    <div class="avatar-upload">
+      <div class="avatar-preview" id="avatarPreviewContainer">
+        <i class="fa-solid fa-user" id="defaultAvatarIcon"></i>
+        <img id="avatarImage" src="" alt="Profile Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
+      </div>
+      <div class="upload-btn-wrapper">
+        <label for="avatarInput" class="btn btn-action">Change Picture</label>
+        <input type="file" id="avatarInput" accept="image/*" hidden />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" placeholder="Enter full name" />
+    </div>
+
+    <div class="form-group">
+      <label for="emailAddr">Email Address</label>
+      <input type="email" id="emailAddr" placeholder="Enter email" />
+    </div>
+
+    <button type="submit" id="saveProfileBtn" class="btn btn-action btn-accent">
+      Save Changes
+    </button>
+  </form>
+</section>
+
+            <!-- MY POSTS LIST -->
+            <section class="dashboard-card" id="posts">
+              <div class="card-title">
+                <h2><i class="fa-solid fa-file-lines"></i> My Recent Posts</h2>
+              </div>
+
+              <div class="post-list" id="myPostsList">
+                <!-- Dynamic User Posts Yahan Render Honge -->
+                <p style="color: #94a3b8; font-size: 0.85rem; padding: 12px">
+                  Loading your posts...
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <!-- RIGHT COLUMN: EVENTS & ANNOUNCEMENTS -->
+          <div class="grid-side">
+            <!-- ANNOUNCEMENTS -->
+            <section class="dashboard-card" id="events">
+              <div class="card-title">
+                <h2><i class="fa-solid fa-bullhorn"></i> Announcements</h2>
+              </div>
+              <div class="mini-list">
+                <div class="mini-item priority">
+                  <span class="tag">Urgent</span>
+                  <h4>Mid-Term Exam Schedule Released</h4>
+                  <span class="time-stamp">2 hours ago</span>
+                </div>
+                <div class="mini-item">
+                  <span class="tag">Campus</span>
+                  <h4>Hackathon 2026 Registrations Open</h4>
+                  <span class="time-stamp">Yesterday</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- UPCOMING EVENTS -->
+            <section class="dashboard-card">
+              <div class="card-title">
+                <h2>
+                  <i class="fa-solid fa-calendar-days"></i> Upcoming Events
+                </h2>
+              </div>
+              <div class="mini-list" id="upcomingEventsList">
+                <!-- Dynamic Supabase Events Yahan Render Honge -->
+                <p style="color: #94a3b8; font-size: 0.85rem; padding: 8px">
+                  Loading events...
+                </p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="js/userDashboard.js"></script>
+  </body>
 </html>
