@@ -36,7 +36,7 @@ async function fetchAdminDashboardStats() {
 
     // 6. Fetch Total Likes (likesapp)
     const { count: likesCount, error: likesErr } = await supabase
-      .from('likesapp')
+      .from('likesApp')
       .select('*', { count: 'exact', head: true });
 
     // --- DOM Update ---
