@@ -146,6 +146,7 @@ async function showUserIcon() {
     `;
     dropdownMenu.insertAdjacentHTML("afterbegin", adminLinkHTML);
   }
+  startWelcomeTypewriter(fullName);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -444,53 +445,34 @@ loadAnnouncements()
 
 // gsap
 
-const userName = document.getElementById("welcomeUserName");
-const text = userName.textContent;
+function startWelcomeTypewriter(fullName) {
+  const userName = document.getElementById("welcomeUserName");
 
-userName.textContent = "";
+  if (!userName || typeof gsap === "undefined") return;
 
-const typewriter = gsap.timeline({
-  repeat: -1,
-  repeatDelay: 0.8,
-});
+  userName.textContent = "";
 
-typewriter
-  // Type
-  .to(
-    userName,
-    {
-      duration: text.length * 0.1,
+  gsap.registerPlugin(TextPlugin);
+
+  const typewriter = gsap.timeline({
+    repeat: -1,
+    repeatDelay: 0.8,
+  });
+
+  typewriter
+    .to(userName, {
+      duration: fullName.length * 0.1,
       ease: "none",
-      text: text,
-    }
-  )
-
-  // Wait
-  .to({}, { duration: 1 })
-
-  // Delete
-  .to(userName, {
-    duration: text.length * 0.06,
-    ease: "none",
-    text: "",
-  })
-
-  // Wait before typing again
-  .to({}, { duration: 0.5 });
-
-
-  document.addEventListener("DOMContentLoaded", () => {
-  if (typeof gsap !== "undefined" && gsap.registerPlugin && typeof ScrollTrigger !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-  }
-
-  initParticles();
-  initButtonHoverLine();
-  initScrollArrow();
-  initPageIntro();
-  initDropdownAnimation();
-  initButtonTapFeedback();
-});
+      text: fullName,
+    })
+    .to({}, { duration: 1 })
+    .to(userName, {
+      duration: fullName.length * 0.06,
+      ease: "none",
+      text: "",
+    })
+    .to({}, { duration: 0.5 });
+}
 
 // ---------------- Floating background particles ----------------
 function initParticles() {
