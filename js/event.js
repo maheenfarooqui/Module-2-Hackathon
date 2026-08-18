@@ -239,6 +239,16 @@ function renderGrid(eventsList) {
   }
 
   container.innerHTML = html;
+
+  function renderGrid(eventsList) {
+  // ... existing card render code ...
+  container.innerHTML = html;
+
+  // Trigger GSAP Card Entrance
+  if (typeof animateCards === 'function') {
+    animateCards();
+  }
+}
 }
 
 /* ==========================================================
@@ -378,7 +388,7 @@ function handleCreateEvent(e) {
 }
 
 /* ==========================================================
-   MODAL & TAB CONTROLS
+   MODAL & TAB CONTROLS (WITH GSAP ANIMATIONS)
    ========================================================== */
 function setTabFilter(filterType) {
   currentTabFilter = filterType;
@@ -391,10 +401,19 @@ var modal = document.getElementById('createEventModal');
 
 function openCreateModal() {
   modal.classList.add('active');
+  if (typeof animateModalOpen === 'function') {
+    animateModalOpen();
+  }
 }
 
 function closeCreateModal() {
-  modal.classList.remove('active');
+  if (typeof animateModalClose === 'function') {
+    animateModalClose(function () {
+      modal.classList.remove('active');
+    });
+  } else {
+    modal.classList.remove('active');
+  }
 }
 
 window.onclick = function (event) {
