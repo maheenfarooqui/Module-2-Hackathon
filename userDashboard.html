@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="css/userDashboard.css">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2><i class="fa-solid fa-cube"></i> Portal</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#welcome" class="nav-link active">
+              <i class="fa-solid fa-house"></i> <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#profile" class="nav-link">
+              <i class="fa-solid fa-user-pen"></i> <span>Edit Profile</span>
+            </a>
+          </li>
+          <li>
+            <a href="#posts" class="nav-link">
+              <i class="fa-solid fa-file-lines"></i> <span>My Posts</span>
+            </a>
+          </li>
+          <li>
+            <a href="#events" class="nav-link">
+              <i class="fa-solid fa-calendar-days"></i> <span>Events & News</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="logout-btn">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT AREA -->
+    <main class="main-content">
+
+      <!-- TOP WELCOME BAR WITH QUICK ACTIONS -->
+      <header class="top-welcome-bar">
+        <div class="user-greeting">
+          <h1>Welcome, <span id="dashUserName">Ali Hassan</span> 👋</h1>
+          <p>Manage your campus profile, posts, and activities.</p>
+        </div>
+
+        <div class="quick-actions">
+          <button class="btn btn-action">
+            <i class="fa-solid fa-pen-to-square"></i> Create Post
+          </button>
+          <button class="btn btn-action">
+            <i class="fa-solid fa-calendar-plus"></i> Create Event
+          </button>
+          <button class="btn btn-action btn-accent">
+            <i class="fa-solid fa-user-group"></i> Find Study Partner
+          </button>
+        </div>
+      </header>
+
+      <!-- STATS BAR -->
+      <section class="stats-container">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">12</span>
+            <span class="stat-label">My Posts</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">04</span>
+            <span class="stat-label">Upcoming Events</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">03</span>
+            <span class="stat-label">Announcements</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTENT GRID -->
+      <div class="content-grid">
+        
+        <!-- LEFT COLUMN: EDIT PROFILE & MY POSTS -->
+        <div class="grid-main">
+
+          <!-- EDIT PROFILE FORM -->
+          <section class="dashboard-card" id="profile-section">
+            <div class="card-title">
+              <h2><i class="fa-solid fa-user-pen"></i> Edit Profile</h2>
+            </div>
+
+            <form class="profile-form" onsubmit="event.preventDefault();">
+              <div class="avatar-upload">
+                <div class="avatar-preview">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="upload-btn-wrapper">
+                  <label for="avatarInput" class="btn btn-action">Change Picture</label>
+                  <input type="file" id="avatarInput" accept="image/*" hidden>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" value="Ali Hassan" placeholder="Enter full name">
+              </div>
+
+              <div class="form-group">
+                <label for="emailAddr">Email Address</label>
+                <input type="email" id="emailAddr" value="ali.hassan@example.com" placeholder="Enter email">
+              </div>
+
+              <button type="submit" class="btn btn-action btn-accent">Save Changes</button>
+            </form>
+          </section>
+
+          <!-- MY POSTS LIST -->
+          <section class="dashboard-card" id="posts-section">
+            <div class="card-title">
+              <h2><i class="fa-solid fa-file-lines"></i> My Recent Posts</h2>
+            </div>
+
+            <div class="post-list">
+              <div class="post-item">
+                <div class="post-header">
+                  <h3>GSAP ScrollTrigger Setup Guide</h3>
+                  <span class="post-date">Aug 15, 2026</span>
+                </div>
+                <p>Shared a full tutorial on how to combine GSAP animations with Tailwind CSS layouts smoothly.</p>
+                <div class="post-actions">
+                  <button class="action-link"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                  <button class="action-link delete"><i class="fa-solid fa-trash"></i> Delete</button>
+                </div>
+              </div>
+
+              <div class="post-item">
+                <div class="post-header">
+                  <h3>Looking for MERN Stack Study Partner</h3>
+                  <span class="post-date">Aug 10, 2026</span>
+                </div>
+                <p>Anyone working on Supabase authentication and Node API backends wants to collaborate?</p>
+                <div class="post-actions">
+                  <button class="action-link"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                  <button class="action-link delete"><i class="fa-solid fa-trash"></i> Delete</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN: EVENTS & ANNOUNCEMENTS -->
+        <div class="grid-side">
+
+          <!-- ANNOUNCEMENTS -->
+          <section class="dashboard-card">
+            <div class="card-title">
+              <h2><i class="fa-solid fa-bullhorn"></i> Announcements</h2>
+            </div>
+            <div class="mini-list">
+              <div class="mini-item priority">
+                <span class="tag">Urgent</span>
+                <h4>Mid-Term Exam Schedule Released</h4>
+                <span class="time-stamp">2 hours ago</span>
+              </div>
+              <div class="mini-item">
+                <span class="tag">Campus</span>
+                <h4>Hackathon 2026 Registrations Open</h4>
+                <span class="time-stamp">Yesterday</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- UPCOMING EVENTS -->
+          <section class="dashboard-card">
+            <div class="card-title">
+              <h2><i class="fa-solid fa-calendar-days"></i> Upcoming Events</h2>
+            </div>
+            <div class="mini-list">
+              <div class="event-item">
+                <div class="event-date">
+                  <span class="day">24</span>
+                  <span class="month">AUG</span>
+                </div>
+                <div class="event-info">
+                  <h4>Web Dev Workshop</h4>
+                  <p><i class="fa-solid fa-location-dot"></i> CS Lab 02</p>
+                </div>
+              </div>
+
+              <div class="event-item">
+                <div class="event-date">
+                  <span class="day">28</span>
+                  <span class="month">AUG</span>
+                </div>
+                <div class="event-info">
+                  <h4>AI & ML Seminar</h4>
+                  <p><i class="fa-solid fa-location-dot"></i> Main Auditorium</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>
