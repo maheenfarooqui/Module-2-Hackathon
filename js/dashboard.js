@@ -338,3 +338,204 @@ async function loadMiniEvents() {
 document.addEventListener("DOMContentLoaded", () => {
   loadMiniEvents();
 });
+async function loadAnnouncements() {
+  const announcementList = document.getElementById("announcementList");
+
+  if (!announcementList) return;
+
+  try {
+    const { data, error } = await supabase
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (error) {
+      console.error("Error loading announcements:", error);
+
+      announcementList.innerHTML = `
+        <p style="color: #f87171; padding: 12px;">
+          Failed to load announcements.
+        </p>
+      `;
+
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      announcementList.innerHTML = `
+        <p style="color: #94a3b8; padding: 12px;">
+          No announcements available.
+        </p>
+      `;
+
+      return;
+    }
+
+    announcementList.innerHTML = "";
+
+    data.forEach((announcement) => {
+      const createdAt = new Date(announcement.created_at);
+
+      const timeAgo = getTimeAgo(createdAt);
+
+      const priorityClass =
+        announcement.category === "Urgent"
+          ? "priority-high"
+          : "";
+
+      announcementList.innerHTML += `
+        <div class="announcement-item ${priorityClass}">
+
+          <span class="tag">
+            ${announcement.category}
+          </span>
+
+          <h3>
+            ${announcement.title}
+          </h3>
+
+          <p>
+            ${announcement.description}
+          </p>
+
+          <span class="time-stamp">
+            ${timeAgo}
+          </span>
+
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Unexpected error:", error);
+  }
+}
+function getTimeAgo(date) {
+  const now = new Date();
+
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) {
+    return "Just now";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) {
+    return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) {
+    return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  }
+
+  const days = Math.floor(hours / 24);
+
+  if (days === 1) {
+    return "Yesterday";
+  }
+
+  return `${days} days ago`;
+}
+loadAnnouncements()
+
+// gsap
+
+const userName = document.getElementById("welcomeUserName");
+const text = userName.textContent;
+
+userName.textContent = "";
+
+const typewriter = gsap.timeline({
+  repeat: -1,
+  repeatDelay: 0.8,
+});
+
+typewriter
+  // Type
+  .to(
+    userName,
+    {
+      duration: text.length * 0.1,
+      ease: "none",
+      text: text,
+    }
+  )
+
+  // Wait
+  .to({}, { duration: 1 })
+
+  // Delete
+  .to(userName, {
+    duration: text.length * 0.06,
+    ease: "none",
+    text: "",
+  })
+
+  // Wait before typing again
+  .to({}, { duration: 0.5 });
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  if (typeof gsap !== "undefined" && gsap.registerPlugin && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  initParticles();
+  initButtonHoverLine();
+  initScrollArrow();
+  initPageIntro();
+  initDropdownAnimation();
+  initButtonTapFeedback();
+});
+
+// ---------------- Floating background particles ----------------
+function initParticles() {
+  const container = document.getElementById("particle-container");
+  if (!container) return;
+
+  const numParticles = 50;
+
+  for (let i = 0; i < numParticles; i++) {
+    createParticle(container);
+  }
+}
+
+function createParticle(container) {
+  const particle = document.createElement("div");
+  particle.className = "particle";
+  container.appendChild(particle);
+
+  const size = Math.random() * 2 + 2; // 2px se 7px tak
+
+  gsap.set(particle, {
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    width: size,
+    height: size,
+    opacity: Math.random() * 0.5 + 0.2,
+  });
+
+  animateParticle(particle);
+}
+
+function animateParticle(particle) {
+  gsap.to(particle, {
+    x: `+=${Math.random() * 200 - 100}`,
+    y: `+=${Math.random() * 200 - 100}`,
+    duration: Math.random() * 10 + 5,
+    ease: "none",
+    onComplete: () => animateParticle(particle),
+  });
+
+  gsap.to(particle, {
+    opacity: Math.random() * 0.8 + 0.1,
+    duration: Math.random() * 2 + 1,
+    repeat: -1,
+    yoyo: true,
+    ease: "sine.inOut",
+  });
+}

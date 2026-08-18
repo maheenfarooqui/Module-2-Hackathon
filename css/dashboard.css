@@ -26,15 +26,16 @@
   font-size: 2rem;
 }
 
-.cursor {
-  color: var(--accent-cyan); /* #8CE5ED */
-  font-weight: bold;
-  animation: blink 0.7s infinite alternate;
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 0.7s infinite;
 }
 
 @keyframes blink {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* NAVBAR LAYOUT */

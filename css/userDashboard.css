@@ -43,6 +43,17 @@ body {
   left: 0;
   z-index: 100;
 }
+#particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Background par le jaane ke liye negative z-index */
+    pointer-events: none;
+    overflow: hidden;
+    background-color: #06181C; /* Dark Hero Theme background */
+}
 
 .brand-logo {
   display: flex;
@@ -293,7 +304,14 @@ body {
   flex-direction: column;
   gap: 1rem;
 }
-
+#announcementDescription {
+  background: var(--bg-input);
+  color: var(--white);
+  border: 1px solid var(--border-glass);
+  padding: 10px;
+  border-radius: 6px;
+  resize: vertical;
+}
 .avatar-upload {
   display: flex;
   align-items: center;
@@ -475,6 +493,256 @@ body {
 .event-info p {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+/* ================================
+   USERS / MODERATION LIST
+   ================================ */
+
+#adminModerationList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.moderation-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px 16px;
+
+  background: var(--bg-input);
+  border: 1px solid var(--border-glass);
+
+  transition: all 0.2s ease;
+}
+
+.moderation-user:hover {
+  border-color: var(--accent-cyan);
+  background: var(--bg-card);
+}
+
+
+/* User Avatar */
+
+.moderation-user .user-profile-circle {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--accent-teal);
+  color: var(--accent-cyan);
+
+  font-weight: 700;
+}
+
+
+/* User Information */
+
+.moderation-user > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.moderation-user .user-name {
+  display: block;
+
+  color: var(--white);
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  margin-bottom: 3px;
+}
+
+.moderation-user .user-email {
+  display: block;
+
+  color: var(--text-muted);
+  font-size: 0.75rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.moderation-user .user-id {
+  display: block;
+
+  color: var(--text-muted);
+  opacity: 0.6;
+
+  font-size: 0.65rem;
+  font-family: monospace;
+
+  margin-top: 3px;
+}
+
+
+/* Delete Button */
+
+.moderation-user .btn-outline-danger {
+  flex-shrink: 0;
+
+  padding: 6px 12px;
+
+  border: 1px solid #ef4444;
+  background: transparent;
+
+  color: #f87171;
+
+  transition: all 0.2s ease;
+}
+
+.moderation-user .btn-outline-danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border-color: #f87171;
+}
+/* ================================
+   RECENT PLATFORM ACTIVITY
+   ================================ */
+
+#adminActivityLogs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px 16px;
+
+  background: var(--bg-input);
+  border: 1px solid var(--border-glass);
+
+  transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-cyan);
+}
+
+
+/* User Avatar */
+
+.activity-item .user-profile-circle {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--accent-teal);
+  color: var(--accent-cyan);
+
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+
+/* Activity Content */
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-user {
+  color: var(--white);
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  margin-bottom: 3px;
+}
+
+.activity-post {
+  color: var(--accent-cyan);
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-description {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+
+  margin-top: 3px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* Date */
+
+.activity-date {
+  flex-shrink: 0;
+
+  color: var(--text-muted);
+  opacity: 0.7;
+
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+  .activity-item {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .activity-date {
+    display: none;
+  }
+
+  .activity-description {
+    max-width: 180px;
+  }
+
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+  .moderation-user {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .moderation-user .user-email {
+    max-width: 150px;
+  }
+
+  .moderation-user .btn-outline-danger {
+    padding: 5px 9px;
+    font-size: 0.7rem;
+  }
+
 }
 
 /* RESPONSIVE BREAKPOINTS */
