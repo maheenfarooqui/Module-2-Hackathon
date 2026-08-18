@@ -112,12 +112,26 @@ function renderNotifications() {
   if (dashboardList) dashboardList.innerHTML = listHTML;
 }
 
-// 6. TOGGLE DROPDOWN
+
 function toggleNotificationDropdown() {
   const dropdown = document.getElementById("notifDropdown");
   if (!dropdown) return;
+  
+ 
   dropdown.classList.toggle("show");
 }
+
+
+window.addEventListener("click", (event) => {
+  const dropdown = document.getElementById("notifDropdown");
+  const bellBtn = document.getElementById("bellIcon");
+
+  if (dropdown && bellBtn) {
+    if (!bellBtn.contains(event.target) && !dropdown.contains(event.target)) {
+      dropdown.classList.remove("show");
+    }
+  }
+});
 
 // 7. MARK ALL AS READ
 async function markAllAsRead() {
