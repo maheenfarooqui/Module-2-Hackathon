@@ -87,7 +87,7 @@
           <a href="communitypost.html" class="nav-link">Posts</a>
           <a href="event.html" class="nav-link">Events</a>
           <a href="studypartnerfinder.html" class="nav-link">Study Partners</a>
-          <a href="#" class="nav-link">Polls</a>
+          <a href="poll.html" class="nav-link">Polls</a>
         </nav>
 
         <!-- Right User Actions -->
@@ -137,86 +137,6 @@
 
   <div id="particle-container"></div>
   <div class="mainapp">
-    <nav
-      class="navbar navbar-expand-lg border-bottom border-secondary sticky-top bgdark py-3"
-    >
-      <div class="container">
-        <div class="row w-100 align-items-center g-0">
-          <div
-            class="col-3 d-flex justify-content-start align-items-center"
-            id="mylogoAnim"
-          >
-          
-          </div>
-          <div class="col-6 d-flex justify-content-center">
-            <div
-              class="input-group style-search-group"
-              style="max-width: 400px; width: 100%"
-              id="searchAnim"
-            >
-              <input
-                type="search"
-                id="searchPost"
-                class="form-control custom-i"
-                placeholder="Search..."
-                style="
-                  border-top-right-radius: 0 !important;
-                  border-bottom-right-radius: 0 !important;
-                "
-              />
-              <button
-                class="btn custom-i border-start-0"
-                type="button"
-                onclick="searchPost()"
-                style="
-                  border-top-left-radius: 0 !important;
-                  border-bottom-left-radius: 0 !important;
-                  color: #6f7a8d;
-                "
-              >
-                <i class="fas fa-search hover-cyan"></i>
-              </button>
-            </div>
-          </div>
-          <div class="col-3 d-flex justify-content-end align-items-center">
-            <div class="dropdown" id="iconAnim">
-              <div
-                class="user-profile-circle shadow-cyan dropdown-toggle"
-                id="icon"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              ></div>
-              <ul
-                id="dropdownMenu"
-                class="dropdown-menu dropdown-menu-end border border-secondary shadow-lg"
-                aria-labelledby="icon"
-                style="
-                  background-color: #1e293b;
-                  border-radius: 5px;
-                  min-width: 80px;
-                  margin-top: 3px;
-                "
-              >
-                <li>
-                  <button
-                    class="dropdown-item btn text-center text-light hover-cyan d-flex align-items-center"
-                    onclick="logout()"
-                    style="
-                      font-size: 0.9rem;
-                      font-family: 'Inter', sans-serif;
-                      background: transparent;
-                      transition: 0.3s;
-                    "
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
     <div class="roundaerro">
       <i id="arrow" class="fa-solid fa-arrow-up-long"></i>
     </div>
@@ -299,7 +219,7 @@
       </div>
     </div>
   </div>
-
+<script src="js/dashboard.js"></script>
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- SweetAlert2 -->
