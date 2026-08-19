@@ -442,6 +442,18 @@ loadAnnouncements();
 
 // gsap
 
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof gsap !== "undefined" && gsap.registerPlugin && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  initParticles();
+  initQuickActionsAnimation();
+  initStatsAnimation();
+  initSectionRevealAnimation();
+  
+});
+
 function startWelcomeTypewriter(fullName) {
   const userName = document.getElementById("welcomeUserName");
 
@@ -543,7 +555,7 @@ function initQuickActionsAnimation() {
     },
   );
 }
-initQuickActionsAnimation();
+
 function initStatsAnimation() {
   gsap.fromTo(
     ".stats-container .stat-card",
@@ -568,7 +580,7 @@ function initStatsAnimation() {
     },
   );
 }
-initStatsAnimation();
+
 function initSectionRevealAnimation() {
   gsap.fromTo(
     ".section-card",
@@ -591,4 +603,4 @@ function initSectionRevealAnimation() {
     },
   );
 }
-initSectionRevealAnimation();
+

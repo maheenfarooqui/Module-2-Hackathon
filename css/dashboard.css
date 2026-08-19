@@ -200,8 +200,8 @@
   top: calc(100% + 0.5rem);
   width: 220px;
   background-color: #0b2226;
-  border: 1px solid rgba(114, 242, 235, 0.2);
-  border-radius: 8px;
+  border: 0px solid rgba(114, 242, 235, 0.2);
+  border-radius: 0px;
   padding: 0.5rem 0;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   display: none;
@@ -373,10 +373,10 @@ body {
 }
 
 /* GRID LAYOUT */
-.dashboard-grid {
+/* .dashboard-grid {
   display: grid;
   gap: 1.5rem;
-}
+} */
 .quick-actions .btn {
   opacity: 0.2;
   filter: brightness(1.8);
