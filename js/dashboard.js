@@ -258,6 +258,18 @@ async function loadStatsCounts() {
         eventsEl.innerText = `${eventsCount}`;
       }
     }
+    // 3. Announcements Table se Total Announcements ka Count
+const { count: announcementsCount, error: announcementsError } = await supabase
+  .from("announcements")
+  .select("*", { count: "exact", head: true });
+
+if (!announcementsError && announcementsCount !== null) {
+  const announcementsEl = document.getElementById("announcementsCount");
+
+  if (announcementsEl) {
+    announcementsEl.innerText = `${announcementsCount}`;
+  }
+}
   } catch (err) {
     console.error("Stats count error:", err.message);
   }
