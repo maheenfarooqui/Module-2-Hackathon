@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const profileTrigger = document.getElementById("profileTrigger");
   const profileDropdown = document.getElementById("profileDropdown");
@@ -16,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileToggle = document.getElementById("mobileToggle");
   const navMenu = document.getElementById("navMenu");
   const logoutBtn = document.getElementById("logoutBtn");
+
+
 
   // 1. Toggle Profile Dropdown
   profileTrigger.addEventListener("click", (e) => {
@@ -72,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, Logout",
         background: "#081d21",
-        color: "#ffffff"
+        color: "#ffffff",
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.href = "index.html";
@@ -81,14 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-
-
-
-
-
-
-
 
 
 
@@ -122,20 +107,12 @@ let currentUserEmail;
 
 // onload function
 window.onload = function () {
-  dataRender();
-  showUserIcon();
+
+   showUserIcon();
 };
 
 
-
-
-
-
-
-
-
-
-
+// user icon
 // user icon
 async function showUserIcon() {
   const {
@@ -143,47 +120,78 @@ async function showUserIcon() {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    Swal.fire({
-      icon: "error",
-      title: "Authentication Error",
-      text: "Please log in to submit a post!",
-      color: "#ffffff",
-      background: "#1e293b",
-      confirmButtonColor: "#ef4444",
-    });
-    return;
-  }
+  if (userError || !user) return;
 
+  // Current logged-in user
   currentUserId = user.id;
   currentUserEmail = user.email;
-  currentUserFname = user.user_metadata.first_name;
-  currentUserLname = user.user_metadata.last_name;
 
-  const firstInitial = currentUserFname.charAt(0).toUpperCase();
-  const lastInitial = currentUserLname.charAt(0).toUpperCase();
+  // User full name
+  const fullName = user.user_metadata?.full_name || "User";
 
-  const iconElement = document.getElementById("icon");
-  if (iconElement) {
-    iconElement.innerHTML = firstInitial + lastInitial;
+  // Current user name
+  currentUserFname = fullName;
+  currentUserLname = "";
+
+  // Show user name
+  const userNameDisplay = document.getElementById("userNameDisplay");
+  if (userNameDisplay) {
+    userNameDisplay.innerText = fullName;
   }
 
-  if (user.user_metadata.role === "admin") {
-    iconElement.innerHTML = '<span style="font-size:12px;">Admin</span>';
-    let menu = document.getElementById("dropdownMenu");
-    menu.insertAdjacentHTML(
-      "afterbegin",
-      `<li>
-        <a class="dropdown-item text-white fw-bold" href="adminDashboard.html">
-          <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
-        </a>
-      </li>
-      <li><hr class="dropdown-divider border-secondary"></li>`,
-    );
+  const welcomeUserName = document.getElementById("welcomeUserName");
+  if (welcomeUserName) {
+    welcomeUserName.innerText = fullName;
   }
 
-  // user icon load hone ke baad feed dobara render karo,
-  // taake har post ka apna Like state (liked/not-liked) sahi dikhe
+  // Profile Picture / Initials
+  const savedAvatarUrl = user.user_metadata?.avatar_url;
+
+  const avatarInitials = document.getElementById("avatarInitials");
+  const avatarImage = document.getElementById("avatarImage");
+
+  if (savedAvatarUrl && avatarImage) {
+    avatarImage.src = savedAvatarUrl;
+    avatarImage.classList.remove("hidden");
+
+    if (avatarInitials) {
+      avatarInitials.classList.add("hidden");
+    }
+  } else if (avatarInitials) {
+    const firstInitial = fullName.charAt(0).toUpperCase();
+
+    avatarInitials.innerText = firstInitial;
+    avatarInitials.classList.remove("hidden");
+
+    if (avatarImage) {
+      avatarImage.classList.add("hidden");
+    }
+  }
+
+  // Admin link
+  const userRole = user.user_metadata?.role;
+  const dropdownMenu = document.getElementById("profileDropdown");
+
+  if (
+    userRole === "admin" &&
+    dropdownMenu &&
+    !document.getElementById("adminDashboardLink")
+  ) {
+    const adminLinkHTML = `
+      <a
+        href="./adminDashboard.html"
+        class="dropdown-item"
+        id="adminDashboardLink"
+      >
+        <i class="fa-solid fa-user-shield"></i>
+        <span>Admin Dashboard</span>
+      </a>
+    `;
+
+    dropdownMenu.insertAdjacentHTML("afterbegin", adminLinkHTML);
+  }
+
+  // User load hone ke baad posts render karo
   dataRender();
 }
 
@@ -578,7 +586,8 @@ async function sumbitPost() {
       }
       isEditMode = false;
       editIndex = null;
-      if (actionBtn) actionBtn.querySelector(".btn-text").innerText = "Post Now";
+      if (actionBtn)
+        actionBtn.querySelector(".btn-text").innerText = "Post Now";
     } catch (err) {
       console.log(err);
       return;
@@ -634,7 +643,8 @@ function editPost(e, id, title, description, time, bgimg) {
       editIndex = id;
       var card = e.target.closest(".cardWraper");
       if (card) card.remove();
-      if (actionBtn) actionBtn.querySelector(".btn-text").innerText = "Update Now";
+      if (actionBtn)
+        actionBtn.querySelector(".btn-text").innerText = "Update Now";
 
       titleInput.scrollIntoView({ behavior: "smooth" });
     }
@@ -656,10 +666,7 @@ async function deletePost(id) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const { error } = await supabase
-          .from("postApp")
-          .delete()
-          .eq("id", id);
+        const { error } = await supabase.from("postApp").delete().eq("id", id);
 
         if (error) {
           console.log(error);
