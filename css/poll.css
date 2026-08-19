@@ -25,14 +25,13 @@
 body { 
   background: var(--bg-dark); 
   color: var(--text-main); 
-  padding: 30px 20px; 
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
 
-.poll-container { max-width: 800px; margin: 0 auto; }
+.poll-container { width: 100%; max-width: 600px; margin: 0 auto; }
 
 .poll-header {
   display: flex; 
@@ -61,6 +60,80 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center; 
   gap: 8px; 
   color: var(--bg-dark);
+  width: fit-content;
+}
+.bell-btn {
+  border: none; 
+  background: none;
+  color: var(--accent-cyan); 
+  width: 44px; 
+  height: 44px; 
+ 
+  cursor: pointer; 
+  position: relative; 
+  font-size: 18px;
+}
+
+.badge {
+  position: absolute; 
+  top: -4px; 
+  right: -4px;
+  background: var(--accent-cyan); 
+  color: var(--bg-dark);
+  font-size: 11px; 
+  padding: 2px 6px; 
+  border-radius: var(--sharp-border); 
+  font-weight: bold;
+}
+
+/* Dropdown */
+.notification-wrapper { position: relative; }
+
+.notification-dropdown {
+  position: absolute; 
+  right: 0; 
+  top: 55px;
+  width: 350px; 
+  border-radius: var(--sharp-border); 
+  padding: 15px;
+  display: none; 
+  opacity: 0; 
+  z-index: 999999;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-teal);
+}
+
+.notification-dropdown.active { display: block;opacity: 1; }
+
+.notif-header {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  margin-bottom: 12px; 
+  border-bottom: 1px solid var(--border-glass); 
+  padding-bottom: 8px;
+}
+
+.mark-read-link { font-size: 12px; color: var(--accent-cyan); cursor: pointer; }
+
+.notif-list { max-height: 350px; overflow-y: auto; }
+
+.notif-item {
+  display: flex; 
+  gap: 12px; 
+  padding: 12px; 
+  border-radius: var(--sharp-border);
+  margin-bottom: 8px; 
+  background: var(--bg-input);
+  border: 1px solid transparent;
+  transition: all 0.2s; 
+  cursor: pointer; 
+  position: relative;
+}
+
+.notif-item.unread { 
+  background: var(--bg-card); 
+  border-left: 3px solid var(--accent-cyan); 
 }
 
 .btn-accent { 
