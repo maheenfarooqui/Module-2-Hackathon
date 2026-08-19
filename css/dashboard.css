@@ -377,6 +377,14 @@ body {
   display: grid;
   gap: 1.5rem;
 }
+.quick-actions .btn {
+  opacity: 0.2;
+  filter: brightness(1.8);
+}
+.stats-container .stat-card {
+  opacity: 0.2;
+  filter: brightness(1.8);
+}
 
 /* STATS OVERVIEW CARDS + HOVER */
 .stats-container {
