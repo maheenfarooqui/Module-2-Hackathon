@@ -8,8 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const navMenu = document.getElementById("navMenu");
   const logoutBtn = document.getElementById("logoutBtn");
 
-
-
   // 1. Toggle Profile Dropdown
   profileTrigger.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -75,8 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-
 // =========================================================
 // app.js — All Supabase / functionality logic
 // (GSAP animation code lives separately in animation.js)
@@ -107,10 +103,8 @@ let currentUserEmail;
 
 // onload function
 window.onload = function () {
-
-   showUserIcon();
+  showUserIcon();
 };
-
 
 // user icon
 // user icon
@@ -424,16 +418,16 @@ async function addComment(postId) {
       .single();
 
     // Notification bhejain (Apni hi post par comment karne par notification skip karein)
-    if (postData && postData.user_id && postData.user_id !== currentUserId) {
-      await supabase.from("notifications").insert([
-        {
-          user_id: postData.user_id, // Jiski post par comment hua hai
-          type: "comment",
-          text: `<b>${currentUserFname} ${currentUserLname}</b> commented on your post.`,
-          is_read: false,
-        },
-      ]);
-    }
+    // if (postData && postData.user_id && postData.user_id !== currentUserId) {
+    //   await supabase.from("notifications").insert([
+    //     {
+    //       user_id: postData.user_id, // Jiski post par comment hua hai
+    //       type: "comment",
+    //       text: `<b>${currentUserFname} ${currentUserLname}</b> commented on your post.`,
+    //       is_read: false,
+    //     },
+    //   ]);
+    // }
 
     inputField.value = "";
     fetchComments(postId);
@@ -603,25 +597,27 @@ async function toggleLike(postId, btnEl) {
       countEl.textContent = currentCount + 1;
 
       // 4. NOTIFICATION INSERT (LIKE SUCCESSFUL HONE KE BAAD)
-      const { data: postData } = await supabase
-        .from("postApp")
-        .select("user_id")
-        .eq("id", postId)
-        .single();
+      // const { data: postData } = await supabase
+      //   .from("postApp")
+      //   .select("user_id")
+      //   .eq("id", postId)
+      //   .single();
 
-      // Apni hi post ko like karne par notification skip karein
-      if (postData && postData.user_id && postData.user_id !== currentUserId) {
-        const userName = `${currentUserFname || ''} ${currentUserLname || ''}`.trim() || 'Someone';
+      // // Apni hi post ko like karne par notification skip karein
+      // if (postData && postData.user_id && postData.user_id !== currentUserId) {
+      //   const userName =
+      //     `${currentUserFname || ""} ${currentUserLname || ""}`.trim() ||
+      //     "Someone";
 
-        await supabase.from("notifications").insert([
-          {
-            user_id: postData.user_id,
-            type: "like",
-            text: `<b>${userName}</b> liked your post.`,
-            is_read: false,
-          },
-        ]);
-      }
+      //   await supabase.from("notifications").insert([
+      //     {
+      //       user_id: postData.user_id,
+      //       type: "like",
+      //       text: `<b>${userName}</b> liked your post.`,
+      //       is_read: false,
+      //     },
+      //   ]);
+      // }
     }
   } catch (err) {
     console.log("Like Error:", err);
@@ -732,6 +728,11 @@ async function sumbitPost() {
       if (error) {
         console.log(error);
       }
+      await createNotification({
+        targetUserId: null, // broadcast — sab ko dikhega
+        type: "post",
+        text: `<b>${currentUserFname} ${currentUserLname}</b> published a new post.`,
+      });
     } catch (err) {
       console.log(err);
       return;
