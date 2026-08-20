@@ -100,6 +100,27 @@ announcementForm?.addEventListener("submit", async (e) => {
   }
 
   console.log("Announcement published:", data);
+  try {
+    const { error: notifError } = await supabase
+      .from("notifications")
+      .insert([
+        {
+          user_id: null, // Broadcast announcement (sab users ke liye)
+          type: "announcement",
+          text: `📢 <b>Admin:</b> ${title}`,
+          is_read: false
+        }
+      ]);
+
+    if (notifError) {
+      console.error("Notification trigger error:", notifError.message);
+    } else {
+      console.log("Notification sent successfully!");
+    }
+  } catch (err) {
+    console.error("Notification Exception:", err);
+  }
+  
 
   Swal.fire({
     icon: "success",

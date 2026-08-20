@@ -415,6 +415,26 @@ async function addComment(postId) {
       return;
     }
 
+    // notificaino add
+
+    const { data: postData } = await supabase
+      .from("postApp")
+      .select("user_id")
+      .eq("id", postId)
+      .single();
+
+    // Notification bhejain (Apni hi post par comment karne par notification skip karein)
+    if (postData && postData.user_id && postData.user_id !== currentUserId) {
+      await supabase.from("notifications").insert([
+        {
+          user_id: postData.user_id, // Jiski post par comment hua hai
+          type: "comment",
+          text: `<b>${currentUserFname} ${currentUserLname}</b> commented on your post.`,
+          is_read: false,
+        },
+      ]);
+    }
+
     inputField.value = "";
     fetchComments(postId);
   } catch (err) {
@@ -501,6 +521,26 @@ async function toggleLike(postId, btnEl) {
         post_id: postId,
         user_id: currentUserId,
       });
+
+      // notification
+
+      const { data: postData } = await supabase
+        .from("postApp")
+        .select("user_id")
+        .eq("id", postId)
+        .single();
+
+      // Apni hi post ko like karne par notification skip karein
+      if (postData && postData.user_id && postData.user_id !== currentUserId) {
+        await supabase.from("notifications").insert([
+          {
+            user_id: postData.user_id, // Jiski post like hui hai
+            type: "like",
+            text: `<b>${currentUserFname || 'Someone'} ${currentUserLname || ''}</b> liked your post.`,
+            is_read: false,
+          },
+        ]);
+      }
 
       if (error) throw error;
 
