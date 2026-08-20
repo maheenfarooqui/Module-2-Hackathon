@@ -411,23 +411,21 @@ async function addComment(postId) {
 
     // notificaino add
 
+
     const { data: postData } = await supabase
       .from("postApp")
       .select("user_id")
       .eq("id", postId)
       .single();
 
-    // Notification bhejain (Apni hi post par comment karne par notification skip karein)
-    // if (postData && postData.user_id && postData.user_id !== currentUserId) {
-    //   await supabase.from("notifications").insert([
-    //     {
-    //       user_id: postData.user_id, // Jiski post par comment hua hai
-    //       type: "comment",
-    //       text: `<b>${currentUserFname} ${currentUserLname}</b> commented on your post.`,
-    //       is_read: false,
-    //     },
-    //   ]);
-    // }
+    if (postData && postData.user_id && postData.user_id !== currentUserId) {
+      const userName = `${currentUserFname || ''} ${currentUserLname || ''}`.trim() || 'Someone';
+      await createNotification({
+        targetUserId: postData.user_id,
+        type: "comment",
+        text: `<b>${userName}</b> commented on your post.`,
+      });
+    }
 
     inputField.value = "";
     fetchComments(postId);
@@ -596,28 +594,21 @@ async function toggleLike(postId, btnEl) {
       iconEl.className = "fas fa-heart";
       countEl.textContent = currentCount + 1;
 
-      // 4. NOTIFICATION INSERT (LIKE SUCCESSFUL HONE KE BAAD)
-      // const { data: postData } = await supabase
-      //   .from("postApp")
-      //   .select("user_id")
-      //   .eq("id", postId)
-      //   .single();
+      // NOTIFICATION
+      const { data: postData } = await supabase
+        .from("postApp")
+        .select("user_id")
+        .eq("id", postId)
+        .single();
 
-      // // Apni hi post ko like karne par notification skip karein
-      // if (postData && postData.user_id && postData.user_id !== currentUserId) {
-      //   const userName =
-      //     `${currentUserFname || ""} ${currentUserLname || ""}`.trim() ||
-      //     "Someone";
-
-      //   await supabase.from("notifications").insert([
-      //     {
-      //       user_id: postData.user_id,
-      //       type: "like",
-      //       text: `<b>${userName}</b> liked your post.`,
-      //       is_read: false,
-      //     },
-      //   ]);
-      // }
+      if (postData && postData.user_id && postData.user_id !== currentUserId) {
+        const userName = `${currentUserFname || ''} ${currentUserLname || ''}`.trim() || 'Someone';
+        await createNotification({
+          targetUserId: postData.user_id,
+          type: "like",
+          text: `<b>${userName}</b> liked your post.`,
+        });
+      }
     }
   } catch (err) {
     console.log("Like Error:", err);
