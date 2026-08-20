@@ -153,7 +153,7 @@
 //   const questionInput = document.getElementById("poll-question");
 //   const question = questionInput.value.trim();
 //   const optionInputs = document.querySelectorAll(".option-input");
-  
+
 //   const optionTexts = [];
 //   optionInputs.forEach((input) => {
 //     if (input.value.trim() !== "") {
@@ -219,30 +219,25 @@
 //   group.appendChild(input);
 // }
 
-
-
 // =========================================================
 // poll.js
 // Polls + Supabase
 // =========================================================
 
 // 1. SUPABASE CLIENT INITIALIZATION
-const pollSupabaseUrl =
-  "https://dpheuwopfkpdynfgjthm.supabase.co";
+const pollSupabaseUrl = "https://dpheuwopfkpdynfgjthm.supabase.co";
 
-const pollSupabaseKey =
-  "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
+const pollSupabaseKey = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
 
 // IMPORTANT:
 // Direct window.supabase use kar rahe hain taake
 // createClient naam kisi doosri JS file se conflict na kare.
 const pollSupabase = window.supabase.createClient(
   pollSupabaseUrl,
-  pollSupabaseKey
+  pollSupabaseKey,
 );
 
 console.log("Poll Supabase Connected Successfully!");
-
 
 // =========================================================
 // 2. POLL STATE
@@ -254,7 +249,6 @@ console.log("Poll Supabase Connected Successfully!");
 let pollCurrentUserId = null;
 
 let polls = [];
-
 
 // =========================================================
 // 3. INITIAL LOAD
@@ -283,12 +277,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Load polls
     await fetchPollsFromSupabase();
-
   } catch (err) {
     console.error("Poll Initialization Error:", err);
   }
 });
-
 
 // =========================================================
 // 4. FETCH POLLS FROM SUPABASE
@@ -298,7 +290,8 @@ async function fetchPollsFromSupabase() {
   try {
     const { data: pollsData, error } = await pollSupabase
       .from("polls")
-      .select(`
+      .select(
+        `
         id,
         question,
         created_at,
@@ -310,7 +303,8 @@ async function fetchPollsFromSupabase() {
           option_id,
           user_id
         )
-      `)
+      `,
+      )
       .order("created_at", {
         ascending: false,
       });
@@ -328,27 +322,20 @@ async function fetchPollsFromSupabase() {
         const votes = poll.poll_votes || [];
 
         // Users who already voted on this poll
-        const votedUsers = [
-          ...new Set(
-            votes.map((vote) => vote.user_id)
-          ),
-        ];
+        const votedUsers = [...new Set(votes.map((vote) => vote.user_id))];
 
         // Poll options with vote counts
-        const options = (poll.poll_options || []).map(
-          (option) => {
-            const count = votes.filter(
-              (vote) =>
-                vote.option_id === option.id
-            ).length;
+        const options = (poll.poll_options || []).map((option) => {
+          const count = votes.filter(
+            (vote) => vote.option_id === option.id,
+          ).length;
 
-            return {
-              id: option.id,
-              text: option.option_text,
-              votes: count,
-            };
-          }
-        );
+          return {
+            id: option.id,
+            text: option.option_text,
+            votes: count,
+          };
+        });
 
         return {
           id: poll.id,
@@ -363,18 +350,13 @@ async function fetchPollsFromSupabase() {
     // -----------------------------------------
     // If database has no polls
     // -----------------------------------------
-
     else {
       polls = [];
     }
 
     renderPolls();
-
   } catch (err) {
-    console.error(
-      "Supabase Poll Fetch Error:",
-      err.message
-    );
+    console.error("Supabase Poll Fetch Error:", err.message);
 
     // Don't break UI if database fails
     polls = [];
@@ -383,14 +365,12 @@ async function fetchPollsFromSupabase() {
   }
 }
 
-
 // =========================================================
 // 5. RENDER POLLS
 // =========================================================
 
 function renderPolls() {
-  const container =
-    document.getElementById("polls-list");
+  const container = document.getElementById("polls-list");
 
   // Agar current page par polls container nahi hai
   // to error nahi ayega.
@@ -412,15 +392,11 @@ function renderPolls() {
   // Render every poll
   polls.forEach((poll) => {
     const totalVotes = poll.options.reduce(
-      (sum, option) =>
-        sum + option.votes,
-      0
+      (sum, option) => sum + option.votes,
+      0,
     );
 
-    const hasVoted =
-      poll.votedUsers.includes(
-        pollCurrentUserId
-      );
+    const hasVoted = poll.votedUsers.includes(pollCurrentUserId);
 
     // -----------------------------------------
     // Options
@@ -429,23 +405,13 @@ function renderPolls() {
     const optionsHTML = poll.options
       .map((option) => {
         const percentage =
-          totalVotes > 0
-            ? Math.round(
-                (option.votes /
-                  totalVotes) *
-                  100
-              )
-            : 0;
+          totalVotes > 0 ? Math.round((option.votes / totalVotes) * 100) : 0;
 
         return `
           <button
             type="button"
             class="poll-option-btn"
-            ${
-              hasVoted
-                ? 'disabled style="cursor: default;"'
-                : ""
-            }
+            ${hasVoted ? 'disabled style="cursor: default;"' : ""}
             onclick="castPollVote(
               '${poll.id}',
               '${option.id}'
@@ -455,11 +421,7 @@ function renderPolls() {
             <div
               class="progress-bar-fill"
               style="
-                width: ${
-                  hasVoted
-                    ? percentage + "%"
-                    : "0%"
-                };
+                width: ${hasVoted ? percentage + "%" : "0%"};
               "
             ></div>
 
@@ -470,11 +432,7 @@ function renderPolls() {
               </span>
 
               <b>
-                ${
-                  hasVoted
-                    ? percentage + "%"
-                    : ""
-                }
+                ${hasVoted ? percentage + "%" : ""}
               </b>
 
             </div>
@@ -488,11 +446,9 @@ function renderPolls() {
     // Poll Card
     // -----------------------------------------
 
-    const card =
-      document.createElement("div");
+    const card = document.createElement("div");
 
-    card.className =
-      "glass-card poll-card";
+    card.className = "glass-card poll-card";
 
     card.innerHTML = `
       <h3 class="text-accent mb-2">
@@ -529,360 +485,457 @@ function renderPolls() {
   });
 
   // GSAP animation agar available ho
-  if (
-    typeof animatePollCards ===
-    "function"
-  ) {
+  if (typeof animatePollCards === "function") {
     animatePollCards();
   }
 }
-
 
 // =========================================================
 // 6. CAST VOTE
 // =========================================================
 
-async function castPollVote(
-  pollId,
-  optionId
-) {
-  // User login check
+// async function castPollVote(pollId, optionId) {
+//   // User login check
+//   if (!pollCurrentUserId) {
+//     alert("Please login before voting.");
+
+//     return;
+//   }
+
+//   // Find poll
+//   const poll = polls.find((item) => String(item.id) === String(pollId));
+
+//   if (!poll) {
+//     console.error("Poll not found:", pollId);
+
+//     return;
+//   }
+
+//   // Already voted?
+//   if (poll.votedUsers.includes(pollCurrentUserId)) {
+//     alert("You can vote only once per poll!");
+
+//     return;
+//   }
+
+//   // Find selected option
+//   const option = poll.options.find(
+//     (item) => String(item.id) === String(optionId),
+//   );
+
+//   if (!option) {
+//     console.error("Poll option not found:", optionId);
+
+//     return;
+//   }
+
+//   // -----------------------------------------
+//   // Optimistic UI
+//   // -----------------------------------------
+
+//   option.votes++;
+
+//   poll.votedUsers.push(pollCurrentUserId);
+
+//   renderPolls();
+
+//   // -----------------------------------------
+//   // Save vote to Supabase
+//   // -----------------------------------------
+
+//   try {
+//     const { error } = await pollSupabase.from("poll_votes").insert([
+//       {
+//         poll_id: pollId,
+//         option_id: optionId,
+//         user_id: pollCurrentUserId,
+//       },
+//     ]);
+
+//     if (error) {
+//       console.error("Vote Insert Error:", error.message);
+
+//       // Reload from database
+//       // so UI gets correct state
+//       await fetchPollsFromSupabase();
+
+//       return;
+//     }
+
+//     // Sync with database
+//     await fetchPollsFromSupabase();
+//     const { data: pollData } = await pollSupabase
+//       .from("polls")
+//       .select("created_by, question")
+//       .eq("id", pollId)
+//       .single();
+
+//     // Apni hi poll par vote karne par notification skip karein
+//     if (
+//       pollData &&
+//       pollData.created_by &&
+//       pollData.created_by !== pollCurrentUserId
+//     ) {
+//       // Current user ka name (agar available ho global variable se)
+//       const voterName =
+//         typeof currentUserFname !== "undefined" && currentUserFname
+//           ? `${currentUserFname} ${currentUserLname || ""}`.trim()
+//           : "Someone";
+
+//       await pollSupabase.from("notifications").insert([
+//         {
+//           user_id: pollData.created_by, // Poll creator ki ID
+//           type: "event", // ya 'poll'
+//           text: `📊 <b>${voterName}</b> voted on your poll: "${pollData.question}"`,
+//           is_read: false,
+//         },
+//       ]);
+//     }
+//   } catch (err) {
+//     console.error("Supabase Vote Error:", err.message);
+
+//     await fetchPollsFromSupabase();
+//   }
+// }
+// =========================================================
+// 6. CAST VOTE WITH NOTIFICATION
+// =========================================================
+
+// =========================================================
+// 6. CAST VOTE WITH NOTIFICATION (FIXED)
+// =========================================================
+
+// =========================================================
+// 6. CAST VOTE (WITH CREATOR NOTIFICATION)
+// =========================================================
+
+async function castPollVote(pollId, optionId) {
   if (!pollCurrentUserId) {
-    alert(
-      "Please login before voting."
-    );
-
+    alert("Please login before voting.");
     return;
   }
 
-  // Find poll
-  const poll = polls.find(
-    (item) =>
-      String(item.id) ===
-      String(pollId)
-  );
+  const poll = polls.find((item) => String(item.id) === String(pollId));
+  if (!poll) return;
 
-  if (!poll) {
-    console.error(
-      "Poll not found:",
-      pollId
-    );
-
+  if (poll.votedUsers.includes(pollCurrentUserId)) {
+    alert("You can vote only once per poll!");
     return;
   }
 
-  // Already voted?
-  if (
-    poll.votedUsers.includes(
-      pollCurrentUserId
-    )
-  ) {
-    alert(
-      "You can vote only once per poll!"
-    );
-
-    return;
-  }
-
-  // Find selected option
   const option = poll.options.find(
-    (item) =>
-      String(item.id) ===
-      String(optionId)
+    (item) => String(item.id) === String(optionId),
   );
+  if (!option) return;
 
-  if (!option) {
-    console.error(
-      "Poll option not found:",
-      optionId
-    );
-
-    return;
-  }
-
-  // -----------------------------------------
-  // Optimistic UI
-  // -----------------------------------------
-
+  // Optimistic UI update
   option.votes++;
-
-  poll.votedUsers.push(
-    pollCurrentUserId
-  );
-
+  poll.votedUsers.push(pollCurrentUserId);
   renderPolls();
 
-  // -----------------------------------------
-  // Save vote to Supabase
-  // -----------------------------------------
-
   try {
-    const { error } =
-      await pollSupabase
-        .from("poll_votes")
-        .insert([
-          {
-            poll_id: pollId,
-            option_id: optionId,
-            user_id:
-              pollCurrentUserId,
-          },
-        ]);
+    // 1. Vote Database Mein Save Karein
+    const { error: voteErr } = await pollSupabase.from("poll_votes").insert([
+      {
+        poll_id: pollId,
+        option_id: optionId,
+        user_id: pollCurrentUserId,
+      },
+    ]);
 
-    if (error) {
-      console.error(
-        "Vote Insert Error:",
-        error.message
-      );
-
-      // Reload from database
-      // so UI gets correct state
+    if (voteErr) {
+      console.error("Vote Error:", voteErr.message);
       await fetchPollsFromSupabase();
-
       return;
     }
 
-    // Sync with database
+    // 2. Poll ke owner/creator ki details dhoonden
+    const { data: pollData } = await pollSupabase
+      .from("polls")
+      .select("created_by, question")
+      .eq("id", pollId)
+      .maybeSingle();
+
+    // -------------------------------------------------------------
+    // 2. NOTIFICATION: JAB KOI VOTE KARE (Only to Poll Creator)
+    // -------------------------------------------------------------
+    if (
+      pollData &&
+      pollData.created_by &&
+      String(pollData.created_by) !== String(pollCurrentUserId)
+    ) {
+      const voterName =
+        typeof currentUserFname !== "undefined" && currentUserFname
+          ? `${currentUserFname} ${currentUserLname || ""}`.trim()
+          : "Someone";
+
+      await pollSupabase.from("notifications").insert([
+        {
+          user_id: pollData.created_by, // Creator ke liye specific ID
+          type: "poll",
+          text: `🗳️ <b>${voterName}</b> voted on your poll: "${pollData.question}"`,
+          is_read: false,
+        },
+      ]);
+    }
+    // -------------------------------------------------------------
+
     await fetchPollsFromSupabase();
-
   } catch (err) {
-    console.error(
-      "Supabase Vote Error:",
-      err.message
-    );
-
+    console.error("Supabase Vote Catch Error:", err);
     await fetchPollsFromSupabase();
   }
 }
-
 
 // =========================================================
 // 7. CREATE NEW POLL
 // =========================================================
 
-const pollForm =
-  document.getElementById(
-    "poll-form"
-  );
+// if (pollForm) {
+//   pollForm.addEventListener("submit", async (e) => {
+//     e.preventDefault();
 
-if (pollForm) {
-  pollForm.addEventListener(
-    "submit",
-    async (e) => {
-      e.preventDefault();
+//     // Login check
+//     if (!pollCurrentUserId) {
+//       alert("Please login before creating a poll.");
 
-      // Login check
-      if (!pollCurrentUserId) {
-        alert(
-          "Please login before creating a poll."
-        );
+//       return;
+//     }
 
-        return;
-      }
+//     const questionInput = document.getElementById("poll-question");
 
-      const questionInput =
-        document.getElementById(
-          "poll-question"
-        );
+//     const optionInputs = document.querySelectorAll(".option-input");
 
-      const optionInputs =
-        document.querySelectorAll(
-          ".option-input"
-        );
+//     if (!questionInput) {
+//       console.error("poll-question input not found.");
 
-      if (!questionInput) {
-        console.error(
-          "poll-question input not found."
-        );
+//       return;
+//     }
 
-        return;
-      }
+//     const question = questionInput.value.trim();
 
-      const question =
-        questionInput.value.trim();
+//     // -----------------------------------------
+//     // Question validation
+//     // -----------------------------------------
 
-      // -----------------------------------------
-      // Question validation
-      // -----------------------------------------
+//     if (!question) {
+//       alert("Please enter a poll question.");
 
-      if (!question) {
-        alert(
-          "Please enter a poll question."
-        );
+//       return;
+//     }
 
-        return;
-      }
+//     // -----------------------------------------
+//     // Collect options
+//     // -----------------------------------------
 
-      // -----------------------------------------
-      // Collect options
-      // -----------------------------------------
+//     const optionTexts = [];
 
-      const optionTexts = [];
+//     optionInputs.forEach((input) => {
+//       const value = input.value.trim();
 
-      optionInputs.forEach(
-        (input) => {
-          const value =
-            input.value.trim();
+//       if (value !== "") {
+//         optionTexts.push(value);
+//       }
+//     });
 
-          if (value !== "") {
-            optionTexts.push(value);
-          }
-        }
-      );
+//     // At least 2 options
+//     if (optionTexts.length < 2) {
+//       alert("Please enter at least 2 options for the poll!");
 
-      // At least 2 options
-      if (optionTexts.length < 2) {
-        alert(
-          "Please enter at least 2 options for the poll!"
-        );
+//       return;
+//     }
 
-        return;
-      }
+//     try {
+//       // -----------------------------------------
+//       // A. Create Poll
+//       // -----------------------------------------
 
-      try {
-        // -----------------------------------------
-        // A. Create Poll
-        // -----------------------------------------
+//       const { data: newPoll, error: pollError } = await pollSupabase
+//         .from("polls")
+//         .insert([
+//           {
+//             question: question,
+//             created_by: pollCurrentUserId,
+//           },
+//         ])
+//         .select()
+//         .single();
 
-        const {
-          data: newPoll,
-          error: pollError,
-        } = await pollSupabase
-          .from("polls")
-          .insert([
-            {
-              question: question,
-              created_by:
-                pollCurrentUserId,
-            },
-          ])
-          .select()
-          .single();
+//       if (pollError) {
+//         throw pollError;
+//       }
 
-        if (pollError) {
-          throw pollError;
-        }
+//       // -----------------------------------------
+//       // B. Create Poll Options
+//       // -----------------------------------------
 
-        // -----------------------------------------
-        // B. Create Poll Options
-        // -----------------------------------------
+//       const optionsToInsert = optionTexts.map((text) => ({
+//         poll_id: newPoll.id,
+//         option_text: text,
+//       }));
 
-        const optionsToInsert =
-          optionTexts.map(
-            (text) => ({
-              poll_id:
-                newPoll.id,
-              option_text:
-                text,
-            })
-          );
+//       const { error: optionError } = await pollSupabase
+//         .from("poll_options")
+//         .insert(optionsToInsert);
 
-        const {
-          error: optionError,
-        } = await pollSupabase
-          .from("poll_options")
-          .insert(
-            optionsToInsert
-          );
+//       if (optionError) {
+//         throw optionError;
+//       }
 
-        if (optionError) {
-          throw optionError;
-        }
+//       // -----------------------------------------
+//       // C. Reset Form
+//       // -----------------------------------------
 
-        // -----------------------------------------
-        // C. Reset Form
-        // -----------------------------------------
+//       pollForm.reset();
 
-        pollForm.reset();
+//       closePollModal();
 
-        closePollModal();
+//       // Reload polls
+//       await fetchPollsFromSupabase();
+//     } catch (err) {
+//       console.error("Error creating poll:", err.message);
 
-        // Reload polls
-        await fetchPollsFromSupabase();
-
-      } catch (err) {
-        console.error(
-          "Error creating poll:",
-          err.message
-        );
-
-        alert(
-          "Failed to create poll. Please try again."
-        );
-      }
-    }
-  );
-}
-
+//       alert("Failed to create poll. Please try again.");
+//     }
+//   });
+// }
 
 // =========================================================
 // 8. OPEN POLL MODAL
 // =========================================================
+// =========================================================
+// 7. CREATE NEW POLL (WITH BROADCAST NOTIFICATION)
+// =========================================================
 
+const pollForm = document.getElementById("poll-form");
+
+if (pollForm) {
+  pollForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!pollCurrentUserId) {
+      alert("Please login before creating a poll.");
+      return;
+    }
+
+    const questionInput = document.getElementById("poll-question");
+    const optionInputs = document.querySelectorAll(".option-input");
+
+    if (!questionInput) return;
+    const question = questionInput.value.trim();
+
+    if (!question) {
+      alert("Please enter a poll question.");
+      return;
+    }
+
+    const optionTexts = [];
+    optionInputs.forEach((input) => {
+      const value = input.value.trim();
+      if (value !== "") optionTexts.push(value);
+    });
+
+    if (optionTexts.length < 2) {
+      alert("Please enter at least 2 options for the poll!");
+      return;
+    }
+
+    try {
+      // A. Create Poll
+      const { data: newPoll, error: pollError } = await pollSupabase
+        .from("polls")
+        .insert([
+          {
+            question: question,
+            created_by: pollCurrentUserId,
+          },
+        ])
+        .select()
+        .single();
+
+      if (pollError) throw pollError;
+
+      // B. Create Poll Options
+      const optionsToInsert = optionTexts.map((text) => ({
+        poll_id: newPoll.id,
+        option_text: text,
+      }));
+
+      const { error: optionError } = await pollSupabase
+        .from("poll_options")
+        .insert(optionsToInsert);
+
+      if (optionError) throw optionError;
+
+      // -------------------------------------------------------------
+      // 1. NOTIFICATION: NAYA POLL BANA (Broadcast to ALL Users)
+      // -------------------------------------------------------------
+      const creatorName =
+        typeof currentUserFname !== "undefined" && currentUserFname
+          ? `${currentUserFname} ${currentUserLname || ""}`.trim()
+          : "Someone";
+
+      await pollSupabase.from("notifications").insert([
+        {
+          user_id: null, // NULL ka matlab sub users ke liye broadcast
+          type: "poll",
+          text: `📊 <b>${creatorName}</b> created a new poll: "${question}"`,
+          is_read: false,
+        },
+      ]);
+      // -------------------------------------------------------------
+
+      pollForm.reset();
+      closePollModal();
+      await fetchPollsFromSupabase();
+    } catch (err) {
+      console.error("Error creating poll:", err.message);
+      alert("Failed to create poll. Please try again.");
+    }
+  });
+}
 function openPollModal() {
-  const modal =
-    document.getElementById(
-      "createPollModal"
-    );
+  const modal = document.getElementById("createPollModal");
 
   if (!modal) return;
 
   modal.classList.add("open");
 
-  if (
-    typeof animateModalOpen ===
-    "function"
-  ) {
+  if (typeof animateModalOpen === "function") {
     animateModalOpen();
   }
 }
-
 
 // =========================================================
 // 9. CLOSE POLL MODAL
 // =========================================================
 
 function closePollModal() {
-  const modal =
-    document.getElementById(
-      "createPollModal"
-    );
+  const modal = document.getElementById("createPollModal");
 
   if (!modal) return;
 
   modal.classList.remove("open");
 }
 
-
 // =========================================================
 // 10. ADD OPTION INPUT
 // =========================================================
 
 function addOptionInput() {
-  const group =
-    document.getElementById(
-      "options-group"
-    );
+  const group = document.getElementById("options-group");
 
   if (!group) return;
 
-  const count =
-    group.querySelectorAll(
-      "input"
-    ).length + 1;
+  const count = group.querySelectorAll("input").length + 1;
 
-  const input =
-    document.createElement(
-      "input"
-    );
+  const input = document.createElement("input");
 
   input.type = "text";
 
-  input.className =
-    "form-control option-input mb-2";
+  input.className = "form-control option-input mb-2";
 
-  input.placeholder =
-    `Option ${count}`;
+  input.placeholder = `Option ${count}`;
 
   group.appendChild(input);
 }

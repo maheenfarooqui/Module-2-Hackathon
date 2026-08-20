@@ -483,6 +483,76 @@ async function fetchComments(postId) {
 // ---------------- Like feature (persisted via Supabase) ----------------
 // Requires a "likesApp" table: id, post_id (fk -> postApp.id), user_id (fk -> auth.users.id)
 // with a UNIQUE(post_id, user_id) constraint so a user can only like a post once.
+// async function toggleLike(postId, btnEl) {
+//   if (!currentUserId) {
+//     Swal.fire({
+//       icon: "error",
+//       title: "Authentication Error",
+//       text: "Please log in to like a post!",
+//       background: "#1e293b",
+//       color: "#ffffff",
+//     });
+//     return;
+//   }
+
+//   const alreadyLiked = btnEl.classList.contains("liked");
+//   const countEl = btnEl.querySelector(".like-count");
+//   const iconEl = btnEl.querySelector("i");
+//   let currentCount = parseInt(countEl.textContent, 10) || 0;
+
+//   // Optimistic UI update (animation ke sath — animation.js handle karega)
+//   if (window.animateLike) window.animateLike(btnEl, !alreadyLiked);
+
+//   try {
+//     if (alreadyLiked) {
+//       const { error } = await supabase
+//         .from("likesApp")
+//         .delete()
+//         .eq("post_id", postId)
+//         .eq("user_id", currentUserId);
+
+//       if (error) throw error;
+
+//       btnEl.classList.remove("liked");
+//       iconEl.className = "far fa-heart";
+//       countEl.textContent = Math.max(currentCount - 1, 0);
+//     } else {
+//       const { error } = await supabase.from("likesApp").insert({
+//         post_id: postId,
+//         user_id: currentUserId,
+//       });
+
+//       // notification
+
+//       const { data: postData } = await supabase
+//         .from("postApp")
+//         .select("user_id")
+//         .eq("id", postId)
+//         .single();
+
+//       // Apni hi post ko like karne par notification skip karein
+//       if (postData && postData.user_id && postData.user_id !== currentUserId) {
+//         await supabase.from("notifications").insert([
+//           {
+//             user_id: postData.user_id, // Jiski post like hui hai
+//             type: "like",
+//             text: `<b>${currentUserFname || 'Someone'} ${currentUserLname || ''}</b> liked your post.`,
+//             is_read: false,
+//           },
+//         ]);
+//       }
+
+//       if (error) throw error;
+
+//       btnEl.classList.add("liked");
+//       iconEl.className = "fas fa-heart";
+//       countEl.textContent = currentCount + 1;
+//     }
+//   } catch (err) {
+//     console.log("Like Error:", err);
+//   }
+// }
+
 async function toggleLike(postId, btnEl) {
   if (!currentUserId) {
     Swal.fire({
@@ -500,11 +570,12 @@ async function toggleLike(postId, btnEl) {
   const iconEl = btnEl.querySelector("i");
   let currentCount = parseInt(countEl.textContent, 10) || 0;
 
-  // Optimistic UI update (animation ke sath — animation.js handle karega)
+  // Optimistic UI animation
   if (window.animateLike) window.animateLike(btnEl, !alreadyLiked);
 
   try {
     if (alreadyLiked) {
+      // 1. UNLIKE OPERATION
       const { error } = await supabase
         .from("likesApp")
         .delete()
@@ -517,13 +588,21 @@ async function toggleLike(postId, btnEl) {
       iconEl.className = "far fa-heart";
       countEl.textContent = Math.max(currentCount - 1, 0);
     } else {
+      // 2. LIKE OPERATION
       const { error } = await supabase.from("likesApp").insert({
         post_id: postId,
         user_id: currentUserId,
       });
 
-      // notification
+      // ERROR PEHLE CHECK KAREIN (Agar database insert fail ho to notification na jaye)
+      if (error) throw error;
 
+      // 3. UI UPDATE
+      btnEl.classList.add("liked");
+      iconEl.className = "fas fa-heart";
+      countEl.textContent = currentCount + 1;
+
+      // 4. NOTIFICATION INSERT (LIKE SUCCESSFUL HONE KE BAAD)
       const { data: postData } = await supabase
         .from("postApp")
         .select("user_id")
@@ -532,24 +611,30 @@ async function toggleLike(postId, btnEl) {
 
       // Apni hi post ko like karne par notification skip karein
       if (postData && postData.user_id && postData.user_id !== currentUserId) {
+        const userName = `${currentUserFname || ''} ${currentUserLname || ''}`.trim() || 'Someone';
+
         await supabase.from("notifications").insert([
           {
-            user_id: postData.user_id, // Jiski post like hui hai
+            user_id: postData.user_id,
             type: "like",
-            text: `<b>${currentUserFname || 'Someone'} ${currentUserLname || ''}</b> liked your post.`,
+            text: `<b>${userName}</b> liked your post.`,
             is_read: false,
           },
         ]);
       }
-
-      if (error) throw error;
-
-      btnEl.classList.add("liked");
-      iconEl.className = "fas fa-heart";
-      countEl.textContent = currentCount + 1;
     }
   } catch (err) {
     console.log("Like Error:", err);
+    // UI Revert on Error
+    if (alreadyLiked) {
+      btnEl.classList.add("liked");
+      iconEl.className = "fas fa-heart";
+      countEl.textContent = currentCount;
+    } else {
+      btnEl.classList.remove("liked");
+      iconEl.className = "far fa-heart";
+      countEl.textContent = currentCount;
+    }
   }
 }
 

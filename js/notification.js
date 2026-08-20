@@ -10,7 +10,9 @@ let notifications = [];
 
 // 2. INITIAL LOAD
 document.addEventListener("DOMContentLoaded", async () => {
-  const { data: { user } } = await _supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await _supabase.auth.getUser();
 
   if (user) {
     notificationUserId = user.id;
@@ -48,9 +50,47 @@ async function fetchNotificationsFromSupabase() {
 }
 
 // 4. REALTIME SUBSCRIBER
+// function setupRealtimeNotifications() {
+//   _supabase
+//     .channel("public:notifications")
+//     .on(
+//       "postgres_changes",
+//       {
+//         event: "INSERT",
+//         schema: "public",
+//         table: "notifications",
+//       },
+//       (payload) => {
+//         const newNotif = payload.new;
+
+//         // Check if targeted to this user or broadcast
+//         if (!newNotif.user_id || newNotif.user_id === notificationUserId) {
+//           notifications.unshift({
+//             id: newNotif.id,
+//             type: newNotif.type,
+//             text: newNotif.text,
+//             time: "Just now",
+//             unread: true,
+//             icon: getNotificationIcon(newNotif.type),
+//           });
+
+//           renderNotifications();
+
+//           // Bell Shake Animation
+//           const bell = document.getElementById("bellIcon");
+//           if (bell) {
+//             bell.classList.add("shake-animation");
+//             setTimeout(() => bell.classList.remove("shake-animation"), 1000);
+//           }
+//         }
+//       }
+//     )
+//     .subscribe();
+// }
+// 4. REALTIME SUBSCRIBER
 function setupRealtimeNotifications() {
   _supabase
-    .channel("public:notifications")
+    .channel("notifications-channel")
     .on(
       "postgres_changes",
       {
@@ -61,8 +101,11 @@ function setupRealtimeNotifications() {
       (payload) => {
         const newNotif = payload.new;
 
-        // Check if targeted to this user or broadcast
-        if (!newNotif.user_id || newNotif.user_id === notificationUserId) {
+        // User ID check (Broadcast ya Targeted User)
+        if (
+          !newNotif.user_id ||
+          String(newNotif.user_id) === String(notificationUserId)
+        ) {
           notifications.unshift({
             id: newNotif.id,
             type: newNotif.type,
@@ -81,7 +124,7 @@ function setupRealtimeNotifications() {
             setTimeout(() => bell.classList.remove("shake-animation"), 1000);
           }
         }
-      }
+      },
     )
     .subscribe();
 }
@@ -115,7 +158,7 @@ function renderNotifications() {
           <span class="notif-time" style="font-size:0.75rem; color:#94a3b8;">${n.time}</span>
         </div>
       </div>
-    `
+    `,
     )
     .join("");
 }
@@ -160,13 +203,20 @@ async function markSingleAsRead(id) {
 // HELPERS
 function getNotificationIcon(type) {
   switch (type) {
-    case "like": return "fa-heart";
-    case "comment": return "fa-comment";
-    case "event": return "fa-calendar-check";
-    case "post": return "fa-pen-to-square";
-    case "poll": return "fa-chart-simple";
-    case "announcement": return "fa-bullhorn";
-    default: return "fa-bell";
+    case "like":
+      return "fa-heart";
+    case "comment":
+      return "fa-comment";
+    case "event":
+      return "fa-calendar-check";
+    case "post":
+      return "fa-pen-to-square";
+    case "poll":
+      return "fa-chart-simple";
+    case "announcement":
+      return "fa-bullhorn";
+    default:
+      return "fa-bell";
   }
 }
 
@@ -184,21 +234,17 @@ function formatTimeAgo(dateString) {
   return date.toLocaleDateString();
 }
 
-
-
 // Universal function to send a notification
 async function createNotification({ targetUserId = null, type, text }) {
   try {
-    const { error } = await _supabase
-      .from("notifications")
-      .insert([
-        {
-          user_id: targetUserId, // Specific user ID ya NULL (Broadcast to all)
-          type: type,            // 'like', 'comment', 'event', 'post', 'announcement'
-          text: text,            // Text string
-          is_read: false
-        }
-      ]);
+    const { error } = await _supabase.from("notifications").insert([
+      {
+        user_id: targetUserId, // Specific user ID ya NULL (Broadcast to all)
+        type: type, // 'like', 'comment', 'event', 'post', 'announcement'
+        text: text, // Text string
+        is_read: false,
+      },
+    ]);
 
     if (error) throw error;
   } catch (err) {
