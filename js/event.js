@@ -510,5 +510,8 @@ window.onclick = function (event) {
     closeCreateModal();
   }
 };
+
+// global exposure for modal control functions
+
 window.openCreateModal = openCreateModal;
 window.closeCreateModal = closeCreateModal;
