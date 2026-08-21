@@ -7,6 +7,9 @@ var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var allEvents = [];
 var currentTabFilter = 'all';
 
+/* ==========================================================
+   HEADER & PROFILE HANDLERS
+   ========================================================== */
 document.addEventListener("DOMContentLoaded", function () {
   var profileTrigger = document.getElementById("profileTrigger");
   var profileDropdown = document.getElementById("profileDropdown");
@@ -17,24 +20,24 @@ document.addEventListener("DOMContentLoaded", function () {
   var navMenu = document.getElementById("navMenu");
   var logoutBtn = document.getElementById("logoutBtn");
 
+  // Load User Details from Supabase Auth
+  showUserIcon();
+
   // 1. Toggle Profile Dropdown
-  if (profileTrigger) {
+  if (profileTrigger && profileDropdown) {
     profileTrigger.addEventListener("click", function (e) {
       e.stopPropagation();
       profileDropdown.classList.toggle("show");
       profileTrigger.classList.toggle("active");
     });
-  }
 
-  // Close Dropdown when clicking outside
-  document.addEventListener("click", function () {
-    if (profileDropdown && profileTrigger) {
+    document.addEventListener("click", function () {
       profileDropdown.classList.remove("show");
       profileTrigger.classList.remove("active");
-    }
-  });
+    });
+  }
 
-  // 2. Profile Image Upload Preview & LocalStorage Persistence
+  // 2. Profile Image LocalStorage Persistence Fallback
   var savedAvatar = localStorage.getItem("userAvatar");
   if (savedAvatar && avatarImage && avatarInitials) {
     avatarImage.src = savedAvatar;
@@ -42,51 +45,143 @@ document.addEventListener("DOMContentLoaded", function () {
     avatarInitials.classList.add("hidden");
   }
 
+  // 3. Profile Picture Upload Listener
   if (profilePicInput) {
-    profilePicInput.addEventListener("change", function (e) {
-      var file = e.target.files[0];
-      if (file) {
-        var reader = new FileReader();
-        reader.onload = function (event) {
-          var imageSrc = event.target.result;
-          avatarImage.src = imageSrc;
-          avatarImage.classList.remove("hidden");
-          avatarInitials.classList.add("hidden");
-          localStorage.setItem("userAvatar", imageSrc);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+    profilePicInput.addEventListener("change", handleProfilePicUpload);
   }
 
-  // 3. Mobile Navigation Toggle
+  // 4. Mobile Navigation Toggle
   if (mobileToggle && navMenu) {
     mobileToggle.addEventListener("click", function () {
       navMenu.classList.toggle("active");
     });
   }
 
-  // 4. Logout Handler
+  // 5. Logout Handler
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
-      Swal.fire({
-        title: "Logout?",
-        text: "Are you sure you want to log out of QuadPulse?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#0e8388",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Logout",
-        background: "#081d21",
-        color: "#ffffff"
-      }).then(function (result) {
-        if (result.isConfirmed) {
+      if (typeof Swal !== "undefined") {
+        Swal.fire({
+          title: "Logout?",
+          text: "Are you sure you want to log out of QuadPulse?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#0e8388",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, Logout",
+          background: "#081d21",
+          color: "#ffffff"
+        }).then(function (result) {
+          if (result.isConfirmed) {
+            window.location.href = "index.html";
+          }
+        });
+      } else {
+        if (confirm("Are you sure you want to log out?")) {
           window.location.href = "index.html";
         }
-      });
+      }
     });
   }
 });
+
+// Helper: Fetch & Display Supabase User Metadata
+async function showUserIcon() {
+  try {
+    var response = await supabase.auth.getUser();
+    var user = response.data ? response.data.user : null;
+    var userError = response.error;
+
+    if (userError || !user) return;
+
+    var fullName = user.user_metadata?.full_name || "User";
+    var userNameDisplay = document.getElementById("userNameDisplay");
+    if (userNameDisplay) userNameDisplay.innerText = fullName;
+
+    var savedAvatarUrl = user.user_metadata?.avatar_url;
+    if (savedAvatarUrl) {
+      displayAvatarImage(savedAvatarUrl);
+    } else {
+      var firstInitial = fullName ? fullName.charAt(0).toUpperCase() : "U";
+      var avatarInitials = document.getElementById("avatarInitials");
+      if (avatarInitials) avatarInitials.innerText = firstInitial;
+    }
+
+    // Dynamic Admin Link Injection
+    var userRole = user.user_metadata?.role;
+    var dropdownMenu = document.getElementById("profileDropdown");
+    if (userRole === "admin" && dropdownMenu && !document.getElementById("adminDashboardLink")) {
+      var adminLinkHTML = 
+        '<a href="./adminDashboard.html" class="dropdown-item" id="adminDashboardLink">' +
+          '<i class="fa-solid fa-user-shield"></i>' +
+          '<span>Admin Dashboard</span>' +
+        '</a>';
+      dropdownMenu.insertAdjacentHTML("afterbegin", adminLinkHTML);
+    }
+  } catch (err) {
+    console.error("Error fetching user profile:", err);
+  }
+}
+
+// Helper: Handle Avatar Upload to Supabase Storage
+async function handleProfilePicUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Please select a valid image file!");
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    alert("File size must be under 2MB!");
+    return;
+  }
+
+  try {
+    var response = await supabase.auth.getUser();
+    var user = response.data ? response.data.user : null;
+    var userError = response.error;
+
+    if (userError || !user) throw new Error("User not authenticated");
+
+    var fileExt = file.name.split(".").pop();
+    var filePath = user.id + "/avatar." + fileExt;
+
+    var uploadRes = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadRes.error) throw uploadRes.error;
+
+    var publicUrlObj = supabase.storage.from("avatars").getPublicUrl(filePath);
+    var avatarUrl = publicUrlObj.data.publicUrl + "?t=" + new Date().getTime();
+
+    var updateRes = await supabase.auth.updateUser({
+      data: { avatar_url: avatarUrl }
+    });
+
+    if (updateRes.error) throw updateRes.error;
+
+    displayAvatarImage(avatarUrl);
+    localStorage.setItem("userAvatar", avatarUrl);
+    alert("Profile picture updated successfully!");
+  } catch (error) {
+    console.error("Upload error:", error.message);
+    alert("Upload Failed: " + error.message);
+  }
+}
+
+// Helper: Display Avatar Image
+function displayAvatarImage(url) {
+  var avatarImage = document.getElementById("avatarImage");
+  var avatarInitials = document.getElementById("avatarInitials");
+
+  if (avatarImage && url) {
+    avatarImage.src = url;
+    avatarImage.classList.remove("hidden");
+    if (avatarInitials) avatarInitials.style.display = "none";
+  }
+}
 
 // APPLICATION INITIALIZATION
 window.addEventListener('DOMContentLoaded', function () {
@@ -104,7 +199,6 @@ function loadEvents() {
     .then(function (response) {
       if (response.error) {
         console.error('Supabase fetch error:', response.error.message);
-        // Fallback to LocalStorage if Supabase fails or keys are not yet configured
         loadFromLocalStorage();
         return;
       }
@@ -240,15 +334,10 @@ function renderGrid(eventsList) {
 
   container.innerHTML = html;
 
-  function renderGrid(eventsList) {
-  // ... existing card render code ...
-  container.innerHTML = html;
-
-  // Trigger GSAP Card Entrance
+  // Trigger GSAP Card Entrance Animation
   if (typeof animateCards === 'function') {
     animateCards();
   }
-}
 }
 
 /* ==========================================================
@@ -375,7 +464,6 @@ function handleCreateEvent(e) {
       if (res.data && res.data.length > 0) {
         allEvents.unshift(res.data[0]);
       } else {
-        // Local fallback in case select fails
         newEvent.id = Date.now();
         allEvents.unshift(newEvent);
       }
@@ -421,3 +509,5 @@ window.onclick = function (event) {
     closeCreateModal();
   }
 };
+window.openCreateModal = openCreateModal;
+window.closeCreateModal = closeCreateModal;

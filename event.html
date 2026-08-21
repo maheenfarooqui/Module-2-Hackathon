@@ -24,7 +24,7 @@
   <body>
     <header class="navbar">
       <div class="nav-container">
-        <a href="#" class="brand-logo">
+        <a href="dashboard.html" class="brand-logo">
           <div class="brand-logo" id="authLogo">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -108,20 +108,35 @@
         </a>
 
         <nav class="nav-menu" id="navMenu">
-          <a href="./dashboard.html" class="nav-link active">Dashboard</a>
-          <a href="./communitypost.html" class="nav-link">Posts</a>
-          <a href="./event.html" class="nav-link">Events</a>
-          <a href="./studypartnerfinder.html" class="nav-link"
-            >Study Partners</a
-          >
-          <a href="./poll.html" class="nav-link">Polls</a>
+          <a href="dashboard.html" class="nav-link active">Dashboard</a>
+          <a href="communitypost.html" class="nav-link">Posts</a>
+          <a href="event.html" class="nav-link">Events</a>
+          <a href="studypartnerfinder.html" class="nav-link">Study Partners</a>
+          <a href="poll.html" class="nav-link">Polls</a>
         </nav>
 
         <div class="user-actions">
-          <button class="notif-btn" title="Notifications">
-            <i class="fa-solid fa-bell"></i>
-            <span class="notif-badge"></span>
-          </button>
+          <div class="notification-wrapper" style="position: relative">
+            <button
+              class="bell-btn"
+              id="bellIcon"
+              onclick="toggleNotificationDropdown()"
+              title="Notifications"
+            >
+              <i class="fa-solid fa-bell"></i>
+              <span class="notif-badge" id="unreadBadge">0</span>
+            </button>
+
+            <div class="notification-dropdown" id="notifDropdown">
+              <div class="notif-header">
+                <h4>Notifications</h4>
+                <span class="mark-read-link" onclick="markAllAsRead()"
+                  >Mark all as read</span
+                >
+              </div>
+              <div class="notif-list" id="notifList"></div>
+            </div>
+          </div>
 
           <div class="profile-dropdown-wrapper">
             <div class="user-profile-trigger" id="profileTrigger">
@@ -149,7 +164,7 @@
                   class="hidden-input"
                 />
               </label>
-              <a href="#" class="dropdown-item">
+              <a href="userDashboard.html" class="dropdown-item">
                 <i class="fa-solid fa-gauge"></i>
                 <span>Go to Your Dashboard</span>
               </a>
