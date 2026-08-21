@@ -473,6 +473,7 @@ function handleCreateEvent(e) {
       closeCreateModal();
       applyFilters();
     });
+
 }
 
 /* ==========================================================

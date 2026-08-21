@@ -1,35 +1,35 @@
-// 1. SUPABASE CLIENT INITIALIZATION
+// 1. SUPABASE INITIALIZATION
 const supbaseUrl = "https://dpheuwopfkpdynfgjthm.supabase.co";
 const supbaseKey = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
 
 const { createClient } = window.supabase;
 const _supabase = createClient(supbaseUrl, supbaseKey);
 
-let currentUserId = null;
+let notificationUserId = null;
 let notifications = [];
 
-// 2. INITIAL LOAD & AUTH CHECK
+// 2. INITIAL LOAD
 document.addEventListener("DOMContentLoaded", async () => {
-  // Get Current Logged-in User
   const {
     data: { user },
   } = await _supabase.auth.getUser();
+
   if (user) {
-    currentUserId = user.id;
+    notificationUserId = user.id;
     await fetchNotificationsFromSupabase();
     setupRealtimeNotifications();
   }
 });
 
-// 3. FETCH NOTIFICATIONS FROM SUPABASE
+// 3. FETCH NOTIFICATIONS
 async function fetchNotificationsFromSupabase() {
-  if (!currentUserId) return;
+  if (!notificationUserId) return;
 
   try {
     const { data, error } = await _supabase
       .from("notifications")
       .select("*")
-      .or(`user_id.eq.${currentUserId},user_id.is.null`) // Specific user or broadcast
+      .or(`user_id.eq.${notificationUserId},user_id.is.null`)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -37,7 +37,7 @@ async function fetchNotificationsFromSupabase() {
     notifications = (data || []).map((item) => ({
       id: item.id,
       type: item.type,
-      text: item.message || item.text,
+      text: item.text || "New activity logged",
       time: formatTimeAgo(item.created_at),
       unread: item.is_read === false,
       icon: getNotificationIcon(item.type),
@@ -45,14 +45,52 @@ async function fetchNotificationsFromSupabase() {
 
     renderNotifications();
   } catch (err) {
-    console.warn("Supabase Fetch Warning:", err.message);
+    console.warn("Supabase Notification Fetch Error:", err.message);
   }
 }
 
-// 4. LISTEN FOR REAL-TIME NOTIFICATIONS
+// 4. REALTIME SUBSCRIBER
+// function setupRealtimeNotifications() {
+//   _supabase
+//     .channel("public:notifications")
+//     .on(
+//       "postgres_changes",
+//       {
+//         event: "INSERT",
+//         schema: "public",
+//         table: "notifications",
+//       },
+//       (payload) => {
+//         const newNotif = payload.new;
+
+//         // Check if targeted to this user or broadcast
+//         if (!newNotif.user_id || newNotif.user_id === notificationUserId) {
+//           notifications.unshift({
+//             id: newNotif.id,
+//             type: newNotif.type,
+//             text: newNotif.text,
+//             time: "Just now",
+//             unread: true,
+//             icon: getNotificationIcon(newNotif.type),
+//           });
+
+//           renderNotifications();
+
+//           // Bell Shake Animation
+//           const bell = document.getElementById("bellIcon");
+//           if (bell) {
+//             bell.classList.add("shake-animation");
+//             setTimeout(() => bell.classList.remove("shake-animation"), 1000);
+//           }
+//         }
+//       }
+//     )
+//     .subscribe();
+// }
+// 4. REALTIME SUBSCRIBER
 function setupRealtimeNotifications() {
   _supabase
-    .channel("public:notifications")
+    .channel("notifications-channel")
     .on(
       "postgres_changes",
       {
@@ -62,18 +100,24 @@ function setupRealtimeNotifications() {
       },
       (payload) => {
         const newNotif = payload.new;
-        if (!newNotif.user_id || newNotif.user_id === currentUserId) {
+
+        // User ID check (Broadcast ya Targeted User)
+        if (
+          !newNotif.user_id ||
+          String(newNotif.user_id) === String(notificationUserId)
+        ) {
           notifications.unshift({
             id: newNotif.id,
             type: newNotif.type,
-            text: newNotif.message || newNotif.text,
+            text: newNotif.text,
             time: "Just now",
             unread: true,
             icon: getNotificationIcon(newNotif.type),
           });
+
           renderNotifications();
 
-          // Bell Icon Shake Effect
+          // Bell Shake Animation
           const bell = document.getElementById("bellIcon");
           if (bell) {
             bell.classList.add("shake-animation");
@@ -85,13 +129,9 @@ function setupRealtimeNotifications() {
     .subscribe();
 }
 
-// 5. RENDER NOTIFICATIONS
+// 5. RENDER UI
 function renderNotifications() {
   const list = document.getElementById("notifList");
-  const pageList = document.getElementById("pageNotifList");
-  const dashboardList = document.querySelector(
-    ".right-column .notification-list",
-  );
   const unreadBadge = document.getElementById("unreadBadge");
 
   const unreadCount = notifications.filter((n) => n.unread).length;
@@ -101,35 +141,34 @@ function renderNotifications() {
     unreadBadge.style.display = unreadCount > 0 ? "inline-block" : "none";
   }
 
-  const listHTML =
-    notifications.length > 0
-      ? notifications
-          .map(
-            (n) => `
-        <div class="notif-item ${n.unread ? "unread" : ""}" onclick="markSingleAsRead('${n.id}')">
-          <div class="notif-icon"><i class="fa-solid ${n.icon}"></i></div>
-          <div style="flex: 1;">
-            <div class="notif-text">${n.text}</div>
-            <span class="notif-time" style="font-size:0.75rem; color:#94a3b8;">${n.time}</span>
-          </div>
-        </div>
-      `,
-          )
-          .join("")
-      : `<div style="padding: 15px; text-align: center; color: #94a3b8;">No notifications yet.</div>`;
+  if (!list) return;
 
-  if (list) list.innerHTML = listHTML;
-  if (pageList) pageList.innerHTML = listHTML;
-  if (dashboardList) dashboardList.innerHTML = listHTML;
+  if (notifications.length === 0) {
+    list.innerHTML = `<div style="padding: 15px; text-align: center; color: #94a3b8;">No notifications yet.</div>`;
+    return;
+  }
+
+  list.innerHTML = notifications
+    .map(
+      (n) => `
+      <div class="notif-item ${n.unread ? "unread" : ""}" onclick="markSingleAsRead('${n.id}')">
+        <div class="notif-icon"><i class="fa-solid ${n.icon}"></i></div>
+        <div style="flex: 1;">
+          <div class="notif-text">${n.text}</div>
+          <span class="notif-time" style="font-size:0.75rem; color:#94a3b8;">${n.time}</span>
+        </div>
+      </div>
+    `,
+    )
+    .join("");
 }
 
 function toggleNotificationDropdown() {
   const dropdown = document.getElementById("notifDropdown");
-  if (!dropdown) return;
-  dropdown.classList.toggle("active");
+  if (dropdown) dropdown.classList.toggle("active");
 }
 
-// 7. MARK ALL AS READ
+// 6. MARK READ FUNCTIONS
 async function markAllAsRead() {
   notifications.forEach((n) => (n.unread = false));
   renderNotifications();
@@ -138,13 +177,12 @@ async function markAllAsRead() {
     await _supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("user_id", currentUserId);
+      .or(`user_id.eq.${notificationUserId},user_id.is.null`);
   } catch (err) {
     console.error("Supabase Error:", err.message);
   }
 }
 
-// 8. MARK SINGLE AS READ
 async function markSingleAsRead(id) {
   const notif = notifications.find((n) => n.id == id);
   if (notif && notif.unread) {
@@ -162,7 +200,7 @@ async function markSingleAsRead(id) {
   }
 }
 
-// HELPER FUNCTIONS
+// HELPERS
 function getNotificationIcon(type) {
   switch (type) {
     case "like":
@@ -194,4 +232,22 @@ function formatTimeAgo(dateString) {
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} hours ago`;
   return date.toLocaleDateString();
+}
+
+// Universal function to send a notification
+async function createNotification({ targetUserId = null, type, text }) {
+  try {
+    const { error } = await _supabase.from("notifications").insert([
+      {
+        user_id: targetUserId, // Specific user ID ya NULL (Broadcast to all)
+        type: type, // 'like', 'comment', 'event', 'post', 'announcement'
+        text: text, // Text string
+        is_read: false,
+      },
+    ]);
+
+    if (error) throw error;
+  } catch (err) {
+    console.error("Failed to create notification:", err.message);
+  }
 }

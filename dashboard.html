@@ -25,9 +25,8 @@
     <header class="navbar">
       <div class="nav-container">
         <!-- Brand Logo -->
-         <a href="dashboard.html" class="brand-logo">
+        <a href="dashboard.html" class="brand-logo">
           <div class="brand-logo" id="authLogo">
-            
             <!-- QUADPULSE MINIMAL Q+P SVG LOGO -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +119,7 @@
 
         <!-- Desktop Navigation Links -->
         <nav class="nav-menu" id="navMenu">
-                    <a href="dashboard.html" class="nav-link active">Dashboard</a>
+          <a href="dashboard.html" class="nav-link active">Dashboard</a>
           <a href="communitypost.html" class="nav-link">Posts</a>
           <a href="event.html" class="nav-link">Events</a>
           <a href="studypartnerfinder.html" class="nav-link">Study Partners</a>
@@ -129,10 +128,6 @@
 
         <!-- Right User Actions -->
         <div class="user-actions">
-          <!-- <button class="notif-btn" title="Notifications">
-            <i class="fa-solid fa-bell"></i>
-            <span class="notif-badge"></span>
-          </button> -->
           <div class="notification-wrapper" style="position: relative">
             <button
               class="bell-btn"
@@ -209,15 +204,16 @@
       <section class="welcome-section">
         <div class="welcome-text">
           <h1>
-  Welcome back,
-  <span id="welcomeUserName">Ali Hassan</span><span class="typing-cursor">|</span>
-</h1>
+            Welcome back,
+            <span id="welcomeUserName"></span
+            ><span class="typing-cursor">|</span>
+          </h1>
           <p>Here is what is happening across your campus community today.</p>
         </div>
 
         <!-- Quick Action Buttons -->
         <div class="quick-actions">
-                    <a href="communitypost.html" class="btn btn-action">
+          <a href="communitypost.html" class="btn btn-action">
             <i class="fa-solid fa-pen-to-square"></i> Create Post
           </a>
           <a href="event.html" class="btn btn-action">
@@ -226,7 +222,7 @@
           <a href="studypartnerfinder.html" class="btn btn-action btn-accent">
             <i class="fa-solid fa-user-group"></i> Find Study Partner
           </a>
-      </div>
+        </div>
       </section>
 
       <!-- DASHBOARD GRID LAYOUT -->
@@ -235,23 +231,23 @@
         <div class="left-column">
           <!-- Stats Overview Bar -->
           <div class="stats-container">
-          <div class="stat-card">
+            <div class="stat-card">
               <div class="stat-icon">
                 <i class="fa-solid fa-file-lines"></i>
               </div>
               <div class="stat-info">
-                                <span class="stat-value" id="totalPostsCount">0</span>
+                <span class="stat-value" id="totalPostsCount">0</span>
                 <span class="stat-label">Total Posts</span>
               </div>
             </div>
 
             <!-- Upcoming Events -->
-     <div class="stat-card">
+            <div class="stat-card">
               <div class="stat-icon">
                 <i class="fa-solid fa-calendar-check"></i>
               </div>
               <div class="stat-info">
-                                <span class="stat-value" id="upcomingEventsCount">0</span>
+                <span class="stat-value" id="upcomingEventsCount">0</span>
                 <span class="stat-label">Events</span>
               </div>
             </div>
@@ -260,30 +256,30 @@
             <div class="stat-card">
               <div class="stat-icon"><i class="fa-solid fa-bullhorn"></i></div>
               <div class="stat-info">
-                <span class="stat-value" id="announcementsCount">03</span>
-           <span class="stat-label">Announcements</span>
+                <span class="stat-value" id="announcementsCount"></span>
+                <span class="stat-label">Announcements</span>
               </div>
             </div>
           </div>
 
-         <!-- Latest Announcements Section -->
-<section class="section-card">
-  <div class="card-header">
-    <h2>
-      <i class="fa-solid fa-bullhorn"></i>
-      Latest Announcements
-    </h2>
+          <!-- Latest Announcements Section -->
+          <section class="section-card">
+            <div class="card-header">
+              <h2>
+                <i class="fa-solid fa-bullhorn"></i>
+                Latest Announcements
+              </h2>
 
-    <a href="#" class="view-all-link">View All</a>
-  </div>
+              <a href="#" class="view-all-link">View All</a>
+            </div>
 
-  <!-- Supabase announcements yahan load hongi -->
-  <div class="announcement-list" id="announcementList">
-    <p style="color: #94a3b8; padding: 12px;">
-      Loading announcements...
-    </p>
-  </div>
-</section>
+            <!-- Supabase announcements yahan load hongi -->
+            <div class="announcement-list" id="announcementList">
+              <p style="color: #94a3b8; padding: 12px">
+                Loading announcements...
+              </p>
+            </div>
+          </section>
 
           <!-- Upcoming Events Section -->
           <section class="section-card">
@@ -299,66 +295,14 @@
             </div>
           </section>
         </div>
-          </section>
-        </div>
-
-
-        <!-- RIGHT COLUMN: NOTIFICATIONS SIDEBAR -->
-        <!-- <div class="right-column">
-          <section class="section-card notifications-card">
-            <div class="card-header">
-              <h2><i class="fa-solid fa-bell"></i> Notifications</h2>
-              <button class="mark-read-btn">Mark all as read</button>
-            </div>
-            <div class="notification-list">
-              <div class="notif-item unread">
-                <div class="notif-avatar">
-                  <i class="fa-solid fa-comment-dots"></i>
-                </div>
-                <div class="notif-text">
-                  <p>
-                    <strong>Sara Ahmed</strong> commented on your study group
-                    request.
-                  </p>
-                  <span class="time-stamp">10 mins ago</span>
-                </div>
-              </div>
-
-              <div class="notif-item unread">
-                <div class="notif-avatar">
-                  <i class="fa-solid fa-user-plus"></i>
-                </div>
-                <div class="notif-text">
-                  <p>
-                    <strong>Zainab Malik</strong> invited you to join
-                    <strong>Web Dev Group</strong>.
-                  </p>
-                  <span class="time-stamp">1 hour ago</span>
-                </div>
-              </div>
-
-              <div class="notif-item">
-                <div class="notif-avatar">
-                  <i class="fa-solid fa-thumbs-up"></i>
-                </div>
-                <div class="notif-text">
-                  <p>
-                    Your post <strong>"GSAP Animation Tips"</strong> got 15 new
-                    likes.
-                  </p>
-                  <span class="time-stamp">3 hours ago</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div> -->
       </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/animation.js"></script>
     <script src="js/notification.js"></script>
     <script src="js/dashboard.js" type="module"></script>

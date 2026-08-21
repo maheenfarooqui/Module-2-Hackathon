@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const profileTrigger = document.getElementById("profileTrigger");
   const profileDropdown = document.getElementById("profileDropdown");
@@ -72,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, Logout",
         background: "#081d21",
-        color: "#ffffff"
+        color: "#ffffff",
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.href = "index.html";
@@ -81,16 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-
-
-
-
-
-
-
-
-
 
 // =========================================================
 // app.js — All Supabase / functionality logic
@@ -122,20 +103,10 @@ let currentUserEmail;
 
 // onload function
 window.onload = function () {
-  dataRender();
   showUserIcon();
 };
 
-
-
-
-
-
-
-
-
-
-
+// user icon
 // user icon
 async function showUserIcon() {
   const {
@@ -143,47 +114,78 @@ async function showUserIcon() {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    Swal.fire({
-      icon: "error",
-      title: "Authentication Error",
-      text: "Please log in to submit a post!",
-      color: "#ffffff",
-      background: "#1e293b",
-      confirmButtonColor: "#ef4444",
-    });
-    return;
-  }
+  if (userError || !user) return;
 
+  // Current logged-in user
   currentUserId = user.id;
   currentUserEmail = user.email;
-  currentUserFname = user.user_metadata.first_name;
-  currentUserLname = user.user_metadata.last_name;
 
-  const firstInitial = currentUserFname.charAt(0).toUpperCase();
-  const lastInitial = currentUserLname.charAt(0).toUpperCase();
+  // User full name
+  const fullName = user.user_metadata?.full_name || "User";
 
-  const iconElement = document.getElementById("icon");
-  if (iconElement) {
-    iconElement.innerHTML = firstInitial + lastInitial;
+  // Current user name
+  currentUserFname = fullName;
+  currentUserLname = "";
+
+  // Show user name
+  const userNameDisplay = document.getElementById("userNameDisplay");
+  if (userNameDisplay) {
+    userNameDisplay.innerText = fullName;
   }
 
-  if (user.user_metadata.role === "admin") {
-    iconElement.innerHTML = '<span style="font-size:12px;">Admin</span>';
-    let menu = document.getElementById("dropdownMenu");
-    menu.insertAdjacentHTML(
-      "afterbegin",
-      `<li>
-        <a class="dropdown-item text-white fw-bold" href="adminDashboard.html">
-          <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
-        </a>
-      </li>
-      <li><hr class="dropdown-divider border-secondary"></li>`,
-    );
+  const welcomeUserName = document.getElementById("welcomeUserName");
+  if (welcomeUserName) {
+    welcomeUserName.innerText = fullName;
   }
 
-  // user icon load hone ke baad feed dobara render karo,
-  // taake har post ka apna Like state (liked/not-liked) sahi dikhe
+  // Profile Picture / Initials
+  const savedAvatarUrl = user.user_metadata?.avatar_url;
+
+  const avatarInitials = document.getElementById("avatarInitials");
+  const avatarImage = document.getElementById("avatarImage");
+
+  if (savedAvatarUrl && avatarImage) {
+    avatarImage.src = savedAvatarUrl;
+    avatarImage.classList.remove("hidden");
+
+    if (avatarInitials) {
+      avatarInitials.classList.add("hidden");
+    }
+  } else if (avatarInitials) {
+    const firstInitial = fullName.charAt(0).toUpperCase();
+
+    avatarInitials.innerText = firstInitial;
+    avatarInitials.classList.remove("hidden");
+
+    if (avatarImage) {
+      avatarImage.classList.add("hidden");
+    }
+  }
+
+  // Admin link
+  const userRole = user.user_metadata?.role;
+  const dropdownMenu = document.getElementById("profileDropdown");
+
+  if (
+    userRole === "admin" &&
+    dropdownMenu &&
+    !document.getElementById("adminDashboardLink")
+  ) {
+    const adminLinkHTML = `
+      <a
+        href="./adminDashboard.html"
+        class="dropdown-item"
+        id="adminDashboardLink"
+      >
+        <i class="fa-solid fa-user-shield"></i>
+        <span>Admin Dashboard</span>
+      </a>
+    `;
+
+    dropdownMenu.insertAdjacentHTML("afterbegin", adminLinkHTML);
+  }
+
+  // User load hone ke baad posts render karo
   dataRender();
 }
 
@@ -407,6 +409,24 @@ async function addComment(postId) {
       return;
     }
 
+    // notificaino add
+
+
+    const { data: postData } = await supabase
+      .from("postApp")
+      .select("user_id")
+      .eq("id", postId)
+      .single();
+
+    if (postData && postData.user_id && postData.user_id !== currentUserId) {
+      const userName = `${currentUserFname || ''} ${currentUserLname || ''}`.trim() || 'Someone';
+      await createNotification({
+        targetUserId: postData.user_id,
+        type: "comment",
+        text: `<b>${userName}</b> commented on your post.`,
+      });
+    }
+
     inputField.value = "";
     fetchComments(postId);
   } catch (err) {
@@ -455,6 +475,76 @@ async function fetchComments(postId) {
 // ---------------- Like feature (persisted via Supabase) ----------------
 // Requires a "likesApp" table: id, post_id (fk -> postApp.id), user_id (fk -> auth.users.id)
 // with a UNIQUE(post_id, user_id) constraint so a user can only like a post once.
+// async function toggleLike(postId, btnEl) {
+//   if (!currentUserId) {
+//     Swal.fire({
+//       icon: "error",
+//       title: "Authentication Error",
+//       text: "Please log in to like a post!",
+//       background: "#1e293b",
+//       color: "#ffffff",
+//     });
+//     return;
+//   }
+
+//   const alreadyLiked = btnEl.classList.contains("liked");
+//   const countEl = btnEl.querySelector(".like-count");
+//   const iconEl = btnEl.querySelector("i");
+//   let currentCount = parseInt(countEl.textContent, 10) || 0;
+
+//   // Optimistic UI update (animation ke sath — animation.js handle karega)
+//   if (window.animateLike) window.animateLike(btnEl, !alreadyLiked);
+
+//   try {
+//     if (alreadyLiked) {
+//       const { error } = await supabase
+//         .from("likesApp")
+//         .delete()
+//         .eq("post_id", postId)
+//         .eq("user_id", currentUserId);
+
+//       if (error) throw error;
+
+//       btnEl.classList.remove("liked");
+//       iconEl.className = "far fa-heart";
+//       countEl.textContent = Math.max(currentCount - 1, 0);
+//     } else {
+//       const { error } = await supabase.from("likesApp").insert({
+//         post_id: postId,
+//         user_id: currentUserId,
+//       });
+
+//       // notification
+
+//       const { data: postData } = await supabase
+//         .from("postApp")
+//         .select("user_id")
+//         .eq("id", postId)
+//         .single();
+
+//       // Apni hi post ko like karne par notification skip karein
+//       if (postData && postData.user_id && postData.user_id !== currentUserId) {
+//         await supabase.from("notifications").insert([
+//           {
+//             user_id: postData.user_id, // Jiski post like hui hai
+//             type: "like",
+//             text: `<b>${currentUserFname || 'Someone'} ${currentUserLname || ''}</b> liked your post.`,
+//             is_read: false,
+//           },
+//         ]);
+//       }
+
+//       if (error) throw error;
+
+//       btnEl.classList.add("liked");
+//       iconEl.className = "fas fa-heart";
+//       countEl.textContent = currentCount + 1;
+//     }
+//   } catch (err) {
+//     console.log("Like Error:", err);
+//   }
+// }
+
 async function toggleLike(postId, btnEl) {
   if (!currentUserId) {
     Swal.fire({
@@ -472,11 +562,12 @@ async function toggleLike(postId, btnEl) {
   const iconEl = btnEl.querySelector("i");
   let currentCount = parseInt(countEl.textContent, 10) || 0;
 
-  // Optimistic UI update (animation ke sath — animation.js handle karega)
+  // Optimistic UI animation
   if (window.animateLike) window.animateLike(btnEl, !alreadyLiked);
 
   try {
     if (alreadyLiked) {
+      // 1. UNLIKE OPERATION
       const { error } = await supabase
         .from("likesApp")
         .delete()
@@ -489,19 +580,48 @@ async function toggleLike(postId, btnEl) {
       iconEl.className = "far fa-heart";
       countEl.textContent = Math.max(currentCount - 1, 0);
     } else {
+      // 2. LIKE OPERATION
       const { error } = await supabase.from("likesApp").insert({
         post_id: postId,
         user_id: currentUserId,
       });
 
+      // ERROR PEHLE CHECK KAREIN (Agar database insert fail ho to notification na jaye)
       if (error) throw error;
 
+      // 3. UI UPDATE
       btnEl.classList.add("liked");
       iconEl.className = "fas fa-heart";
       countEl.textContent = currentCount + 1;
+
+      // NOTIFICATION
+      const { data: postData } = await supabase
+        .from("postApp")
+        .select("user_id")
+        .eq("id", postId)
+        .single();
+
+      if (postData && postData.user_id && postData.user_id !== currentUserId) {
+        const userName = `${currentUserFname || ''} ${currentUserLname || ''}`.trim() || 'Someone';
+        await createNotification({
+          targetUserId: postData.user_id,
+          type: "like",
+          text: `<b>${userName}</b> liked your post.`,
+        });
+      }
     }
   } catch (err) {
     console.log("Like Error:", err);
+    // UI Revert on Error
+    if (alreadyLiked) {
+      btnEl.classList.add("liked");
+      iconEl.className = "fas fa-heart";
+      countEl.textContent = currentCount;
+    } else {
+      btnEl.classList.remove("liked");
+      iconEl.className = "far fa-heart";
+      countEl.textContent = currentCount;
+    }
   }
 }
 
@@ -578,7 +698,8 @@ async function sumbitPost() {
       }
       isEditMode = false;
       editIndex = null;
-      if (actionBtn) actionBtn.querySelector(".btn-text").innerText = "Post Now";
+      if (actionBtn)
+        actionBtn.querySelector(".btn-text").innerText = "Post Now";
     } catch (err) {
       console.log(err);
       return;
@@ -598,6 +719,11 @@ async function sumbitPost() {
       if (error) {
         console.log(error);
       }
+      await createNotification({
+        targetUserId: null, // broadcast — sab ko dikhega
+        type: "post",
+        text: `<b>${currentUserFname} ${currentUserLname}</b> published a new post.`,
+      });
     } catch (err) {
       console.log(err);
       return;
@@ -634,7 +760,8 @@ function editPost(e, id, title, description, time, bgimg) {
       editIndex = id;
       var card = e.target.closest(".cardWraper");
       if (card) card.remove();
-      if (actionBtn) actionBtn.querySelector(".btn-text").innerText = "Update Now";
+      if (actionBtn)
+        actionBtn.querySelector(".btn-text").innerText = "Update Now";
 
       titleInput.scrollIntoView({ behavior: "smooth" });
     }
@@ -656,10 +783,7 @@ async function deletePost(id) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const { error } = await supabase
-          .from("postApp")
-          .delete()
-          .eq("id", id);
+        const { error } = await supabase.from("postApp").delete().eq("id", id);
 
         if (error) {
           console.log(error);

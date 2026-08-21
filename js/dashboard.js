@@ -146,6 +146,7 @@ async function showUserIcon() {
     `;
     dropdownMenu.insertAdjacentHTML("afterbegin", adminLinkHTML);
   }
+  startWelcomeTypewriter(fullName);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -257,6 +258,18 @@ async function loadStatsCounts() {
         eventsEl.innerText = `${eventsCount}`;
       }
     }
+    // 3. Announcements Table se Total Announcements ka Count
+const { count: announcementsCount, error: announcementsError } = await supabase
+  .from("announcements")
+  .select("*", { count: "exact", head: true });
+
+if (!announcementsError && announcementsCount !== null) {
+  const announcementsEl = document.getElementById("announcementsCount");
+
+  if (announcementsEl) {
+    announcementsEl.innerText = `${announcementsCount}`;
+  }
+}
   } catch (err) {
     console.error("Stats count error:", err.message);
   }
@@ -380,9 +393,7 @@ async function loadAnnouncements() {
       const timeAgo = getTimeAgo(createdAt);
 
       const priorityClass =
-        announcement.category === "Urgent"
-          ? "priority-high"
-          : "";
+        announcement.category === "Urgent" ? "priority-high" : "";
 
       announcementList.innerHTML += `
         <div class="announcement-item ${priorityClass}">
@@ -406,7 +417,6 @@ async function loadAnnouncements() {
         </div>
       `;
     });
-
   } catch (error) {
     console.error("Unexpected error:", error);
   }
@@ -440,57 +450,50 @@ function getTimeAgo(date) {
 
   return `${days} days ago`;
 }
-loadAnnouncements()
+loadAnnouncements();
 
 // gsap
 
-const userName = document.getElementById("welcomeUserName");
-const text = userName.textContent;
-
-userName.textContent = "";
-
-const typewriter = gsap.timeline({
-  repeat: -1,
-  repeatDelay: 0.8,
-});
-
-typewriter
-  // Type
-  .to(
-    userName,
-    {
-      duration: text.length * 0.1,
-      ease: "none",
-      text: text,
-    }
-  )
-
-  // Wait
-  .to({}, { duration: 1 })
-
-  // Delete
-  .to(userName, {
-    duration: text.length * 0.06,
-    ease: "none",
-    text: "",
-  })
-
-  // Wait before typing again
-  .to({}, { duration: 0.5 });
-
-
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   if (typeof gsap !== "undefined" && gsap.registerPlugin && typeof ScrollTrigger !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
   }
 
   initParticles();
-  initButtonHoverLine();
-  initScrollArrow();
-  initPageIntro();
-  initDropdownAnimation();
-  initButtonTapFeedback();
+  initQuickActionsAnimation();
+  initStatsAnimation();
+  initSectionRevealAnimation();
+  
 });
+
+function startWelcomeTypewriter(fullName) {
+  const userName = document.getElementById("welcomeUserName");
+
+  if (!userName || typeof gsap === "undefined") return;
+
+  userName.textContent = "";
+
+  gsap.registerPlugin(TextPlugin);
+
+  const typewriter = gsap.timeline({
+    repeat: -1,
+    repeatDelay: 0.8,
+  });
+
+  typewriter
+    .to(userName, {
+      duration: fullName.length * 0.1,
+      ease: "none",
+      text: fullName,
+    })
+    .to({}, { duration: 1 })
+    .to(userName, {
+      duration: fullName.length * 0.06,
+      ease: "none",
+      text: "",
+    })
+    .to({}, { duration: 0.5 });
+}
 
 // ---------------- Floating background particles ----------------
 function initParticles() {
@@ -539,3 +542,77 @@ function animateParticle(particle) {
     ease: "sine.inOut",
   });
 }
+
+function initQuickActionsAnimation() {
+  gsap.fromTo(
+    ".quick-actions .btn",
+    {
+      opacity: 0.2,
+      filter: "brightness(1.8)",
+      y: 20,
+    },
+    {
+      opacity: 1,
+      filter: "brightness(1)",
+      y: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: "power2.out",
+
+      scrollTrigger: {
+        trigger: ".quick-actions",
+        start: "top 85%",
+        toggleActions: "restart none restart reverse",
+      },
+    },
+  );
+}
+
+function initStatsAnimation() {
+  gsap.fromTo(
+    ".stats-container .stat-card",
+    {
+      opacity: 0.2,
+      filter: "brightness(1.8)",
+      y: 20,
+    },
+    {
+      opacity: 1,
+      filter: "brightness(1)",
+      y: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: "power2.out",
+
+      scrollTrigger: {
+        trigger: ".stats-container",
+        start: "top 85%",
+        toggleActions: "restart none restart reverse",
+      },
+    },
+  );
+}
+
+function initSectionRevealAnimation() {
+  gsap.fromTo(
+    ".section-card",
+    {
+      opacity: 0,
+      y: 80,
+    },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.9,
+      stagger: 0.5,
+      ease: "power3.out",
+
+      scrollTrigger: {
+        trigger: ".section-card",
+        start: "top 85%",
+        toggleActions: "restart none restart reverse",
+      },
+    },
+  );
+}
+

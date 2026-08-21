@@ -12,6 +12,8 @@
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/notification.css" />
     <link rel="stylesheet" href="css/studypartner.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -133,7 +135,7 @@
           title="Notifications"
         >
           <i class="fa-solid fa-bell"></i>
-          <span class="notif-badge" id="unreadBadge">0</span>
+          <span class="notif-badge" id="unreadBadge" style="color: bisque;">0</span>
         </button>
 
         <div class="notification-dropdown" id="notifDropdown">
@@ -320,6 +322,7 @@
       <div class="partners-grid" id="partnersContainer"></div>
     </div>
 
+    <script src="js/notification.js"></script>
     <script src="js/studypartner.js"></script>
     <script type="module" src="js/animationjs/animationstdpartner.js"></script>
   </body>
