@@ -1,12 +1,12 @@
 var SUPABASE_URL = "https://dpheuwopfkpdynfgjthm.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
-
+ 
 // Initialize Supabase Client
 var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+ 
 var allEvents = [];
 var currentTabFilter = 'all';
-
+ 
 /* ==========================================================
    HEADER & PROFILE HANDLERS
    ========================================================== */
@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", function () {
   var mobileToggle = document.getElementById("mobileToggle");
   var navMenu = document.getElementById("navMenu");
   var logoutBtn = document.getElementById("logoutBtn");
-
+ 
   // Load User Details from Supabase Auth
   showUserIcon();
-
+ 
   // 1. Toggle Profile Dropdown
   if (profileTrigger && profileDropdown) {
     profileTrigger.addEventListener("click", function (e) {
@@ -30,13 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
       profileDropdown.classList.toggle("show");
       profileTrigger.classList.toggle("active");
     });
-
+ 
     document.addEventListener("click", function () {
       profileDropdown.classList.remove("show");
       profileTrigger.classList.remove("active");
     });
   }
-
+ 
   // 2. Profile Image LocalStorage Persistence Fallback
   var savedAvatar = localStorage.getItem("userAvatar");
   if (savedAvatar && avatarImage && avatarInitials) {
@@ -44,19 +44,19 @@ document.addEventListener("DOMContentLoaded", function () {
     avatarImage.classList.remove("hidden");
     avatarInitials.classList.add("hidden");
   }
-
+ 
   // 3. Profile Picture Upload Listener
   if (profilePicInput) {
     profilePicInput.addEventListener("change", handleProfilePicUpload);
   }
-
+ 
   // 4. Mobile Navigation Toggle
   if (mobileToggle && navMenu) {
     mobileToggle.addEventListener("click", function () {
       navMenu.classList.toggle("active");
     });
   }
-
+ 
   // 5. Logout Handler
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
@@ -84,20 +84,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-
+ 
 // Helper: Fetch & Display Supabase User Metadata
 async function showUserIcon() {
   try {
     var response = await supabase.auth.getUser();
     var user = response.data ? response.data.user : null;
     var userError = response.error;
-
+ 
     if (userError || !user) return;
-
+ 
     var fullName = user.user_metadata?.full_name || "User";
     var userNameDisplay = document.getElementById("userNameDisplay");
     if (userNameDisplay) userNameDisplay.innerText = fullName;
-
+ 
     var savedAvatarUrl = user.user_metadata?.avatar_url;
     if (savedAvatarUrl) {
       displayAvatarImage(savedAvatarUrl);
@@ -106,7 +106,7 @@ async function showUserIcon() {
       var avatarInitials = document.getElementById("avatarInitials");
       if (avatarInitials) avatarInitials.innerText = firstInitial;
     }
-
+ 
     // Dynamic Admin Link Injection
     var userRole = user.user_metadata?.role;
     var dropdownMenu = document.getElementById("profileDropdown");
@@ -122,12 +122,12 @@ async function showUserIcon() {
     console.error("Error fetching user profile:", err);
   }
 }
-
+ 
 // Helper: Handle Avatar Upload to Supabase Storage
 async function handleProfilePicUpload(event) {
   var file = event.target.files[0];
   if (!file) return;
-
+ 
   if (!file.type.startsWith("image/")) {
     alert("Please select a valid image file!");
     return;
@@ -136,32 +136,32 @@ async function handleProfilePicUpload(event) {
     alert("File size must be under 2MB!");
     return;
   }
-
+ 
   try {
     var response = await supabase.auth.getUser();
     var user = response.data ? response.data.user : null;
     var userError = response.error;
-
+ 
     if (userError || !user) throw new Error("User not authenticated");
-
+ 
     var fileExt = file.name.split(".").pop();
     var filePath = user.id + "/avatar." + fileExt;
-
+ 
     var uploadRes = await supabase.storage
       .from("avatars")
       .upload(filePath, file, { upsert: true });
-
+ 
     if (uploadRes.error) throw uploadRes.error;
-
+ 
     var publicUrlObj = supabase.storage.from("avatars").getPublicUrl(filePath);
     var avatarUrl = publicUrlObj.data.publicUrl + "?t=" + new Date().getTime();
-
+ 
     var updateRes = await supabase.auth.updateUser({
       data: { avatar_url: avatarUrl }
     });
-
+ 
     if (updateRes.error) throw updateRes.error;
-
+ 
     displayAvatarImage(avatarUrl);
     localStorage.setItem("userAvatar", avatarUrl);
     alert("Profile picture updated successfully!");
@@ -170,24 +170,24 @@ async function handleProfilePicUpload(event) {
     alert("Upload Failed: " + error.message);
   }
 }
-
+ 
 // Helper: Display Avatar Image
 function displayAvatarImage(url) {
   var avatarImage = document.getElementById("avatarImage");
   var avatarInitials = document.getElementById("avatarInitials");
-
+ 
   if (avatarImage && url) {
     avatarImage.src = url;
     avatarImage.classList.remove("hidden");
     if (avatarInitials) avatarInitials.style.display = "none";
   }
 }
-
+ 
 // APPLICATION INITIALIZATION
 window.addEventListener('DOMContentLoaded', function () {
   loadEvents();
 });
-
+ 
 /* ==========================================================
    READ (FETCH EVENTS FROM SUPABASE)
    ========================================================== */
@@ -195,6 +195,7 @@ function loadEvents() {
   supabase
     .from('events')
     .select('*')
+    .eq('status', 'approved') // only show events admin has approved
     .order('date', { ascending: true })
     .then(function (response) {
       if (response.error) {
@@ -202,7 +203,7 @@ function loadEvents() {
         loadFromLocalStorage();
         return;
       }
-
+ 
       if (response.data && response.data.length > 0) {
         allEvents = response.data;
       } else {
@@ -215,7 +216,7 @@ function loadEvents() {
       loadFromLocalStorage();
     });
 }
-
+ 
 // FALLBACK LOCAL STORAGE FUNCTION
 function loadFromLocalStorage() {
   var storedData = localStorage.getItem('campus_events_data');
@@ -226,11 +227,11 @@ function loadFromLocalStorage() {
   }
   applyFilters();
 }
-
+ 
 function saveEventsToStorage() {
   localStorage.setItem('campus_events_data', JSON.stringify(allEvents));
 }
-
+ 
 /* ==========================================================
    HELPER FUNCTIONS FOR DATE & TIME FORMATTING
    ========================================================== */
@@ -238,32 +239,32 @@ function formatDate(dateString) {
   if (!dateString) return '';
   var parts = dateString.split('-');
   if (parts.length !== 3) return dateString;
-
+ 
   var year = parts[0];
   var month = parseInt(parts[1], 10) - 1;
   var day = parseInt(parts[2], 10);
-
+ 
   var dateObj = new Date(year, month, day);
   var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return months[dateObj.getMonth()] + ' ' + day + ', ' + year;
 }
-
+ 
 function formatTime(timeString) {
   if (!timeString) return '';
   var parts = timeString.split(':');
   if (parts.length < 2) return timeString;
-
+ 
   var hours = parseInt(parts[0], 10);
   var minutes = parts[1];
   var ampm = hours >= 12 ? 'PM' : 'AM';
-
+ 
   hours = hours % 12;
   hours = hours ? hours : 12;
   var hoursStr = hours < 10 ? '0' + hours : hours;
-
+ 
   return hoursStr + ':' + minutes + ' ' + ampm;
 }
-
+ 
 /* ==========================================================
    FILTER & RENDER LOGIC
    ========================================================== */
@@ -271,45 +272,50 @@ function applyFilters() {
   var searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
   var categoryValue = document.getElementById('categoryFilter').value;
   var today = new Date().toISOString().split('T')[0];
-
+ 
   var filteredList = allEvents.filter(function (eventItem) {
+    var title = (eventItem.title || '').toLowerCase();
+    var location = (eventItem.location || '').toLowerCase();
+    var description = (eventItem.description || '').toLowerCase();
+ 
     var matchesSearch =
-      eventItem.title.toLowerCase().includes(searchValue) ||
-      eventItem.location.toLowerCase().includes(searchValue) ||
-      eventItem.description.toLowerCase().includes(searchValue);
-
+      title.includes(searchValue) ||
+      location.includes(searchValue) ||
+      description.includes(searchValue);
+ 
     var matchesCategory =
       categoryValue === 'all' || eventItem.category === categoryValue;
-
+ 
     var matchesTab = true;
     if (currentTabFilter === 'upcoming') {
       matchesTab = eventItem.date >= today;
     }
-
+ 
     return matchesSearch && matchesCategory && matchesTab;
   });
-
+ 
   renderGrid(filteredList);
 }
-
+ 
 function renderGrid(eventsList) {
   var container = document.getElementById('eventsContainer');
-
+ 
   if (eventsList.length === 0) {
     container.innerHTML = '<div class="empty-message">No matching events found.</div>';
     return;
   }
-
+ 
   var html = '';
   for (var i = 0; i < eventsList.length; i++) {
     var item = eventsList[i];
     var displayDate = item.formatted_date || formatDate(item.date);
     var displayTime = item.formatted_time || formatTime(item.time);
-
+    var participantsCount = item.participants || 0;
+ 
     var actionButton = item.is_registered
       ? '<button class="btn-danger" onclick="toggleRegistration(' + item.id + ')"><i class="fa-solid fa-user-xmark icon-left"></i> Cancel Registration</button>'
       : '<button class="btn-outline" onclick="toggleRegistration(' + item.id + ')"><i class="fa-solid fa-user-plus icon-left"></i> Register</button>';
-
+ 
     html += '<article class="event-card">' +
       '<div class="card-image-wrapper">' +
         '<img src="' + item.image + '" class="card-image" alt="Event">' +
@@ -325,47 +331,47 @@ function renderGrid(eventsList) {
           '<li><i class="fa-solid fa-location-dot"></i> ' + item.location + '</li>' +
         '</ul>' +
         '<div class="card-footer">' +
-          '<span class="registered-count"><i class="fa-solid fa-users icon-left"></i> ' + item.participants + ' Registered</span>' +
+          '<span class="registered-count"><i class="fa-solid fa-users icon-left"></i> ' + participantsCount + ' Registered</span>' +
           actionButton +
         '</div>' +
       '</div>' +
     '</article>';
   }
-
+ 
   container.innerHTML = html;
-
+ 
   // Trigger GSAP Card Entrance Animation
   if (typeof animateCards === 'function') {
     animateCards();
   }
 }
-
+ 
 /* ==========================================================
    UPDATE (TOGGLE REGISTRATION)
    ========================================================== */
 function toggleRegistration(id) {
   var targetEvent = null;
-
+ 
   for (var i = 0; i < allEvents.length; i++) {
     if (allEvents[i].id === id) {
       targetEvent = allEvents[i];
       break;
     }
   }
-
+ 
   if (!targetEvent) return;
-
+ 
   var updatedStatus = !targetEvent.is_registered;
   var updatedCount = updatedStatus
     ? targetEvent.participants + 1
     : Math.max(0, targetEvent.participants - 1);
-
+ 
   // Optimistic UI Update
   targetEvent.is_registered = updatedStatus;
   targetEvent.participants = updatedCount;
   applyFilters();
   saveEventsToStorage();
-
+ 
   // Supabase DB Update
   supabase
     .from('events')
@@ -380,14 +386,14 @@ function toggleRegistration(id) {
       }
     });
 }
-
+ 
 /* ==========================================================
    DELETE (REMOVE EVENT)
    ========================================================== */
 function deleteEvent(id) {
   var confirmAction = confirm("Are you sure you want to delete this event?");
   if (!confirmAction) return;
-
+ 
   // Optimistic UI Update
   var updatedList = [];
   for (var i = 0; i < allEvents.length; i++) {
@@ -395,11 +401,11 @@ function deleteEvent(id) {
       updatedList.push(allEvents[i]);
     }
   }
-
+ 
   allEvents = updatedList;
   applyFilters();
   saveEventsToStorage();
-
+ 
   // Supabase DB Delete
   supabase
     .from('events')
@@ -411,27 +417,27 @@ function deleteEvent(id) {
       }
     });
 }
-
+ 
 /* ==========================================================
    CREATE (INSERT EVENT)
    ========================================================== */
 function handleCreateEvent(e) {
   e.preventDefault();
-
+ 
   var submitBtn = document.getElementById('submitBtn');
   submitBtn.disabled = true;
   submitBtn.innerText = 'Posting...';
-
+ 
   var rawDate = document.getElementById('eventDate').value;
   var rawTime = document.getElementById('eventTime').value;
-
+ 
   if (!rawDate || !rawTime) {
     alert("Please select both Date and Time.");
     submitBtn.disabled = false;
     submitBtn.innerText = 'Post Event';
     return;
   }
-
+ 
   var newEvent = {
     title: document.getElementById('eventTitle').value,
     description: document.getElementById('eventDesc').value,
@@ -443,9 +449,10 @@ function handleCreateEvent(e) {
     category: document.getElementById('eventCategory').value,
     image: document.getElementById('eventImage').value,
     participants: 0,
-    is_registered: false
+    is_registered: false,
+    status: 'pending' // requires admin approval before it becomes public
   };
-
+ 
   // Supabase DB Insert
   supabase
     .from('events')
@@ -454,28 +461,39 @@ function handleCreateEvent(e) {
     .then(function (res) {
       submitBtn.disabled = false;
       submitBtn.innerText = 'Post Event';
-
+ 
       if (res.error) {
         console.error('Insert event error:', res.error.message);
         alert('Failed to save event to database: ' + res.error.message);
         return;
       }
-
-      if (res.data && res.data.length > 0) {
-        allEvents.unshift(res.data[0]);
-      } else {
-        newEvent.id = Date.now();
-        allEvents.unshift(newEvent);
-      }
-
-      saveEventsToStorage();
+ 
       document.getElementById('createEventForm').reset();
       closeCreateModal();
-      applyFilters();
+ 
+      // Reset any active filters so the newly created event is guaranteed
+      // to be visible right away, even if a search term / category / tab
+      // filter was active that would otherwise hide it.
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = 'all';
+      currentTabFilter = 'all';
+      document.getElementById('filterAllBtn').className = 'tab-btn active';
+      document.getElementById('filterUpcomingBtn').className = 'tab-btn';
+ 
+      alert('Event submitted! It will be visible once an admin approves it.');
+ 
+      // Re-fetch fresh (approved) events from Supabase.
+      loadEvents();
+    })
+    .catch(function (err) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Post Event';
+      console.error('Insert event network/unexpected error:', err);
+      alert('Failed to save event to database: ' + err.message);
     });
-
+ 
 }
-
+ 
 /* ==========================================================
    MODAL & TAB CONTROLS (WITH GSAP ANIMATIONS)
    ========================================================== */
@@ -485,16 +503,16 @@ function setTabFilter(filterType) {
   document.getElementById('filterUpcomingBtn').className = filterType === 'upcoming' ? 'tab-btn active' : 'tab-btn';
   applyFilters();
 }
-
+ 
 var modal = document.getElementById('createEventModal');
-
+ 
 function openCreateModal() {
   modal.classList.add('active');
   if (typeof animateModalOpen === 'function') {
     animateModalOpen();
   }
 }
-
+ 
 function closeCreateModal() {
   if (typeof animateModalClose === 'function') {
     animateModalClose(function () {
@@ -504,14 +522,21 @@ function closeCreateModal() {
     modal.classList.remove('active');
   }
 }
-
+ 
 window.onclick = function (event) {
   if (event.target === modal) {
     closeCreateModal();
   }
 };
-
-// global exposure for modal control functions
-
+ 
+// global exposure for module-scoped functions used via inline HTML attributes
+// (needed because this file loads as type="module", which does not expose
+// top-level function declarations on `window` automatically)
 window.openCreateModal = openCreateModal;
 window.closeCreateModal = closeCreateModal;
+window.applyFilters = applyFilters;
+window.setTabFilter = setTabFilter;
+window.toggleRegistration = toggleRegistration;
+window.deleteEvent = deleteEvent;
+window.handleCreateEvent = handleCreateEvent;
+ 

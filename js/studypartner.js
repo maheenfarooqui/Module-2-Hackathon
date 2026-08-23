@@ -200,7 +200,9 @@ toggleFormBtn.addEventListener("click", () => {
   const isOpening = !addProfileForm.classList.contains("active");
   addProfileForm.classList.toggle("active");
   
-  toggleFormBtn.textContent = isOpening ? "Close Form" : "Add My Profile";
+  toggleFormBtn.innerHTML = isOpening
+    ? '<i class="fa-solid fa-xmark icon-left"></i> Close Form'
+    : '<i class="fa-solid fa-user-plus icon-left"></i> Add My Profile';
   
   if (typeof animateFormToggle === "function") {
     animateFormToggle(isOpening);
@@ -211,7 +213,8 @@ toggleFormBtn.addEventListener("click", () => {
 async function fetchPartners() {
   partnersContainer.innerHTML = `
     <div class="no-results card-box">
-      Loading study partners...
+      <i class="fa-solid fa-spinner fa-spin no-results-icon"></i>
+      <p>Loading study partners...</p>
     </div>
   `;
 
@@ -224,7 +227,8 @@ async function fetchPartners() {
     console.error("Error fetching data:", error);
     partnersContainer.innerHTML = `
       <div class="no-results card-box" style="color: #ff6b6b;">
-        Failed to load profiles. Please check Supabase configuration.
+        <i class="fa-solid fa-triangle-exclamation no-results-icon"></i>
+        <p>Failed to load profiles. Please check Supabase configuration.</p>
       </div>
     `;
     return;
@@ -241,15 +245,18 @@ function renderPartners(data) {
   if (data.length === 0) {
     partnersContainer.innerHTML = `
       <div class="no-results card-box">
-        No study partners found matching your criteria.
+        <i class="fa-solid fa-user-group no-results-icon"></i>
+        <p>No study partners found matching your criteria.</p>
       </div>
     `;
     return;
   }
 
   data.forEach(partner => {
-    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name)}&background=124B57&color=8CE5ED`;
-    
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name || "S")}&background=124B57&color=8CE5ED`;
+    const subjectsList = partner.subjects || [];
+    const skillsList = partner.skills || [];
+
     const card = document.createElement("div");
     card.className = "partner-card";
     card.innerHTML = `
@@ -267,26 +274,26 @@ function renderPartners(data) {
           </div>
         </div>
 
-        <p class="bio">${partner.intro}</p>
+        <p class="bio">${partner.intro || ""}</p>
 
         <div class="detail-section">
           <div class="detail-label">Subjects</div>
           <div class="tags-container">
-            ${partner.subjects.map(s => `<span class="tag">${s.trim()}</span>`).join("")}
+            ${subjectsList.map(s => `<span class="tag">${s.trim()}</span>`).join("")}
           </div>
         </div>
 
         <div class="detail-section">
           <div class="detail-label">Skills</div>
           <div class="tags-container">
-            ${partner.skills.map(s => `<span class="tag skill">${s.trim()}</span>`).join("")}
+            ${skillsList.map(s => `<span class="tag skill">${s.trim()}</span>`).join("")}
           </div>
         </div>
       </div>
 
       <div class="card-footer">
         <div class="availability">
-          🕒 <span>${partner.availability}</span>
+          <i class="fa-regular fa-clock"></i> <span>${partner.availability || ""}</span>
         </div>
       </div>
     `;
@@ -306,8 +313,11 @@ function filterPartners() {
   const levelQuery = filterLevel.value;
 
   const filtered = partners.filter(partner => {
-    const matchesSubject = !subjectQuery || partner.subjects.some(s => s.toLowerCase().includes(subjectQuery));
-    const matchesSkill = !skillQuery || partner.skills.some(s => s.toLowerCase().includes(skillQuery));
+    const subjectsList = partner.subjects || [];
+    const skillsList = partner.skills || [];
+
+    const matchesSubject = !subjectQuery || subjectsList.some(s => s.toLowerCase().includes(subjectQuery));
+    const matchesSkill = !skillQuery || skillsList.some(s => s.toLowerCase().includes(skillQuery));
     const matchesLevel = !levelQuery || partner.experience === levelQuery;
 
     return matchesSubject && matchesSkill && matchesLevel;
@@ -325,7 +335,7 @@ profileForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   submitBtn.disabled = true;
-  submitBtn.textContent = "Publishing...";
+  submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Publishing...';
 
   const newPartner = {
     name: document.getElementById("name").value.trim(),
@@ -342,7 +352,7 @@ profileForm.addEventListener("submit", async (e) => {
     .insert([newPartner]);
 
   submitBtn.disabled = false;
-  submitBtn.textContent = "Publish Profile";
+  submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
 
   if (error) {
     console.error("Error inserting data:", error);
