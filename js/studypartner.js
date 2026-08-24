@@ -184,6 +184,8 @@ function displayAvatarImage(url) {
    STUDY PARTNER FINDER CORE LOGIC
    ========================================================== */
 let partners = [];
+let currentUserId = null;
+let editingPartnerId = null;
 
 // DOM Elements
 const partnersContainer = document.getElementById("partnersContainer");
@@ -199,7 +201,14 @@ const submitBtn = document.getElementById("submitBtn");
 toggleFormBtn.addEventListener("click", () => {
   const isOpening = !addProfileForm.classList.contains("active");
   addProfileForm.classList.toggle("active");
-  
+
+  if (!isOpening) {
+    // Closing without submitting — reset back to "create" mode
+    editingPartnerId = null;
+    profileForm.reset();
+    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
+  }
+
   toggleFormBtn.innerHTML = isOpening
     ? '<i class="fa-solid fa-xmark icon-left"></i> Close Form'
     : '<i class="fa-solid fa-user-plus icon-left"></i> Add My Profile';
@@ -208,6 +217,63 @@ toggleFormBtn.addEventListener("click", () => {
     animateFormToggle(isOpening);
   }
 });
+
+// Edit: prefill the form with this partner's existing data and switch to update mode
+window.editPartnerProfile = function (id) {
+  const partner = partners.find(p => p.id === id);
+  if (!partner) return;
+
+  editingPartnerId = id;
+  document.getElementById("name").value = partner.name || "";
+  document.getElementById("picture").value = partner.picture || "";
+  document.getElementById("experience").value = partner.experience || "";
+  document.getElementById("availability").value = partner.availability || "";
+  document.getElementById("subjects").value = (partner.subjects || []).join(", ");
+  document.getElementById("skills").value = (partner.skills || []).join(", ");
+  document.getElementById("bio").value = partner.intro || "";
+
+  submitBtn.innerHTML = '<i class="fa-solid fa-pen icon-left"></i> Update Profile';
+
+  if (!addProfileForm.classList.contains("active")) {
+    addProfileForm.classList.add("active");
+    toggleFormBtn.innerHTML = '<i class="fa-solid fa-xmark icon-left"></i> Close Form';
+    if (typeof animateFormToggle === "function") {
+      animateFormToggle(true);
+    }
+  }
+
+  addProfileForm.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+// Delete: remove the current user's own profile
+window.deletePartnerProfile = async function (id) {
+  const confirmAction = confirm("Are you sure you want to delete your study partner profile?");
+  if (!confirmAction) return;
+
+  const { error } = await supabaseClient
+    .from("study_partners")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Delete partner error:", error);
+    alert("Failed to delete profile: " + error.message);
+    return;
+  }
+
+  fetchPartners();
+};
+
+// Helper: Know which logged-in user is viewing, so we can show
+// Edit/Delete controls only on that user's own profile card.
+async function loadCurrentUser() {
+  try {
+    const { data } = await supabaseClient.auth.getUser();
+    currentUserId = data?.user?.id || null;
+  } catch (err) {
+    console.error("Error loading current user:", err);
+  }
+}
 
 // Fetch Data from Supabase
 async function fetchPartners() {
@@ -256,10 +322,23 @@ function renderPartners(data) {
     const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name || "S")}&background=124B57&color=8CE5ED`;
     const subjectsList = partner.subjects || [];
     const skillsList = partner.skills || [];
+    const isOwner = currentUserId && partner.user_id === currentUserId;
+
+    const ownerActions = isOwner ? `
+      <div class="card-owner-actions">
+        <button class="btn-icon" onclick="editPartnerProfile(${partner.id})" title="Edit your profile">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="btn-icon btn-icon-danger" onclick="deletePartnerProfile(${partner.id})" title="Delete your profile">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    ` : "";
 
     const card = document.createElement("div");
     card.className = "partner-card";
     card.innerHTML = `
+      ${ownerActions}
       <div>
         <div class="profile-header">
           <img 
@@ -335,9 +414,11 @@ profileForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Publishing...';
+  submitBtn.innerHTML = editingPartnerId
+    ? '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Updating...'
+    : '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Publishing...';
 
-  const newPartner = {
+  const partnerPayload = {
     name: document.getElementById("name").value.trim(),
     picture: document.getElementById("picture").value.trim() || null,
     experience: document.getElementById("experience").value,
@@ -347,27 +428,49 @@ profileForm.addEventListener("submit", async (e) => {
     intro: document.getElementById("bio").value.trim()
   };
 
-  const { error } = await supabaseClient
-    .from("study_partners")
-    .insert([newPartner]);
+  let error;
+
+  if (editingPartnerId) {
+    ({ error } = await supabaseClient
+      .from("study_partners")
+      .update(partnerPayload)
+      .eq("id", editingPartnerId));
+  } else {
+    partnerPayload.user_id = currentUserId;
+    ({ error } = await supabaseClient
+      .from("study_partners")
+      .insert([partnerPayload]));
+  }
 
   submitBtn.disabled = false;
   submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
 
   if (error) {
-    console.error("Error inserting data:", error);
-    alert("Error publishing profile: " + error.message);
+    console.error("Error saving profile:", error);
+    alert("Error saving profile: " + error.message);
     return;
   }
 
   profileForm.reset();
+  editingPartnerId = null;
   if (typeof animateFormToggle === "function") {
     animateFormToggle(false);
   }
   addProfileForm.classList.remove("active");
-  toggleFormBtn.textContent = "Add My Profile";
+  toggleFormBtn.innerHTML = '<i class="fa-solid fa-user-plus icon-left"></i> Add My Profile';
+
+  // Reset any active filters so the newly saved profile is guaranteed
+  // to be visible right away, even if a search/filter was active that
+  // would otherwise hide it.
+  filterSubject.value = "";
+  filterSkill.value = "";
+  filterLevel.value = "";
+
   fetchPartners();
 });
 
 
-fetchPartners();
+(async function init() {
+  await loadCurrentUser();
+  fetchPartners();
+})();
