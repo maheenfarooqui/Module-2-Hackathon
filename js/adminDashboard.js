@@ -317,3 +317,228 @@ async function loadRecentActivities() {
   }
 }
 loadRecentActivities();
+
+
+
+// for event contro
+ 
+// async function loadPendingEvents() {
+//   const pendingEventsList = document.getElementById("pendingEventsList");
+//   if (!pendingEventsList) return;
+ 
+//   try {
+//     const { data, error } = await supabase
+//       .from("events")
+//       .select("*")
+//       .eq("status", "pending")
+//       .order("date", { ascending: true });
+ 
+//     if (error) {
+//       console.error("Error loading pending events:", error);
+//       pendingEventsList.innerHTML = `
+//         <p style="color:#94a3b8; font-size:0.85rem; padding:8px">
+//           Failed to load pending events.
+//         </p>`;
+//       return;
+//     }
+ 
+//     if (!data || data.length === 0) {
+//       pendingEventsList.innerHTML = `
+//         <p style="color:#94a3b8; font-size:0.85rem; padding:8px">
+//           No pending events right now.
+//         </p>`;
+//       return;
+//     }
+ 
+//     pendingEventsList.innerHTML = "";
+ 
+//     data.forEach((eventItem) => {
+//       pendingEventsList.innerHTML += `
+//         <div class="moderation-user" id="pending-event-${eventItem.id}">
+//           <div>
+//             <span class="fw-bold d-block text-white" style="font-size: 0.85rem;">
+//               ${eventItem.title || "Untitled Event"}
+//             </span>
+//             <span class="text-light opacity-50 d-block" style="font-size: 0.7rem;">
+//               ${eventItem.category || ""} • ${eventItem.date || ""} ${eventItem.time || ""}
+//             </span>
+//             <span class="text-light opacity-50 d-block" style="font-size: 0.7rem;">
+//               ${eventItem.location || ""}
+//             </span>
+//           </div>
+ 
+//           <div style="display:flex; gap:6px; margin-left:auto;">
+//             <button
+//               class="btn btn-sm btn-outline-success"
+//               style="font-size: 0.75rem;"
+//               onclick="approveEvent(${eventItem.id})"
+//             >
+//               Approve
+//             </button>
+//             <button
+//               class="btn btn-sm btn-outline-danger"
+//               style="font-size: 0.75rem;"
+//               onclick="rejectEvent(${eventItem.id})"
+//             >
+//               Reject
+//             </button>
+//           </div>
+//         </div>
+//       `;
+//     });
+//   } catch (err) {
+//     console.error("Pending events exception:", err);
+//   }
+// }
+async function loadPendingEvents() {
+  const pendingEventsList = document.getElementById("pendingEventsList");
+  if (!pendingEventsList) return;
+
+  try {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .eq("status", "pending")
+      .order("date", { ascending: true });
+
+    if (error) {
+      console.error("Error loading pending events:", error);
+      pendingEventsList.innerHTML = `
+        <p style="color:#94a3b8; font-size:0.85rem; padding:8px">
+          Failed to load pending events.
+        </p>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      pendingEventsList.innerHTML = `
+        <p style="color:#94a3b8; font-size:0.85rem; padding:8px">
+          No pending events right now.
+        </p>`;
+      return;
+    }
+
+    pendingEventsList.innerHTML = "";
+
+    data.forEach((eventItem) => {
+      pendingEventsList.innerHTML += `
+        <div class="moderation-user" id="pending-event-${eventItem.id}">
+          <div style="flex: 1; min-width: 140px; padding-right: 8px;">
+            <span class="fw-bold d-block text-white" style="font-size: 0.85rem; word-break: break-word;">
+              ${eventItem.title || "Untitled Event"}
+            </span>
+            <span class="text-light opacity-50 d-block" style="font-size: 0.7rem;">
+              ${eventItem.category || ""} • ${eventItem.date || ""} ${eventItem.time || ""}
+            </span>
+            <span class="text-light opacity-50 d-block" style="font-size: 0.7rem; word-break: break-word;">
+              ${eventItem.location || ""}
+            </span>
+          </div>
+
+          <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+            <button
+              class="btn btn-sm btn-outline-success"
+              style="font-size: 0.7rem; padding: 2px 8px; white-space: nowrap;"
+              onclick="approveEvent('${eventItem.id}')"
+            >
+              Approve
+            </button>
+            <button
+              class="btn btn-sm btn-outline-danger"
+              style="font-size: 0.7rem; padding: 2px 8px; white-space: nowrap;"
+              onclick="rejectEvent('${eventItem.id}')"
+            >
+              Reject
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error("Pending events exception:", err);
+  }
+}
+ 
+window.approveEvent = async function (id) {
+  try {
+    const { error } = await supabaseAdmin
+      .from("events")
+      .update({ status: "approved" })
+      .eq("id", id);
+ 
+    if (error) {
+      console.error("Approve event error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed!",
+        text: "Could not approve this event.",
+        background: "#1e293b",
+        color: "#ffffff",
+      });
+      return;
+    }
+ 
+    Swal.fire({
+      icon: "success",
+      title: "Approved!",
+      text: "Event is now live for all users.",
+      background: "#1e293b",
+      color: "#ffffff",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+ 
+    loadPendingEvents();
+  } catch (err) {
+    console.error(err);
+  }
+};
+ 
+window.rejectEvent = async function (id) {
+  const result = await Swal.fire({
+    icon: "warning",
+    title: "Reject this event?",
+    text: "The organizer's event will not be published.",
+    color: "#ffffff",
+    background: "#1e293b",
+    showCancelButton: true,
+    confirmButtonText: "Yes, reject",
+    confirmButtonColor: "#ef4444",
+    cancelButtonColor: "#64748b",
+  });
+ 
+  if (!result.isConfirmed) return;
+ 
+  try {
+    const { error } = await supabaseAdmin
+      .from("events")
+      .update({ status: "rejected" })
+      .eq("id", id);
+ 
+    if (error) {
+      console.error("Reject event error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed!",
+        text: "Could not reject this event.",
+        background: "#1e293b",
+        color: "#ffffff",
+      });
+      return;
+    }
+ 
+    Swal.fire({
+      icon: "success",
+      title: "Rejected",
+      text: "Event has been rejected.",
+      background: "#1e293b",
+      color: "#ffffff",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+ 
+    loadPendingEvents();
+  } catch (err) {
+    console.error(err)}
+  }
+   loadPendingEvents() 
