@@ -530,6 +530,22 @@ body {
   color: var(--white);
   margin-bottom: 0.3rem;
 }
+.moderation-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; /* Small screen par buttons smooth adjust hongay */
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#events-section, .mini-list {
+  overflow-x: hidden; /* Out of bounds content hide rahega */
+  width: 100%;
+}
 
 .announcement-item p {
   font-size: 0.85rem;
