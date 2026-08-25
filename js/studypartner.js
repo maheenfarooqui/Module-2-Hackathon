@@ -185,7 +185,9 @@ function displayAvatarImage(url) {
    ========================================================== */
 let partners = [];
 let currentUserId = null;
+let currentUserName = "A student";
 let editingPartnerId = null;
+let sentRequestPartnerIds = new Set();
 
 // DOM Elements
 const partnersContainer = document.getElementById("partnersContainer");
@@ -264,14 +266,91 @@ window.deletePartnerProfile = async function (id) {
   fetchPartners();
 };
 
+// Send Request: notify a study partner that this user wants to connect
+window.sendPartnerRequest = async function (partnerId, receiverId) {
+  if (!currentUserId) {
+    alert("Please log in to send a study partner request.");
+    return;
+  }
+  if (receiverId === currentUserId) {
+    return; // safety guard, shouldn't happen since button is hidden on own card
+  }
+  if (sentRequestPartnerIds.has(String(partnerId))) {
+    return; // already requested
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("study_partner_requests")
+      .insert([
+        {
+          sender_id: currentUserId,
+          receiver_id: receiverId,
+          partner_id: partnerId,
+          status: "pending"
+        }
+      ]);
+
+    if (error) {
+      console.error("Send request error:", error);
+      alert("Failed to send request: " + error.message);
+      return;
+    }
+
+    // Best-effort notification for the receiver — if this fails, the
+    // request itself has still gone through, so we don't alert on it.
+    try {
+      await supabaseClient.from("notifications").insert([
+        {
+          user_id: receiverId,
+          type: "study_request",
+          text: `<b>${currentUserName}</b> sent you a study partner request.`,
+          is_read: false
+        }
+      ]);
+    } catch (notifErr) {
+      console.error("Request notification error:", notifErr);
+    }
+
+    sentRequestPartnerIds.add(String(partnerId));
+    filterPartners();
+  } catch (err) {
+    console.error("Send request exception:", err);
+    alert("Something went wrong sending the request.");
+  }
+};
+
 // Helper: Know which logged-in user is viewing, so we can show
 // Edit/Delete controls only on that user's own profile card.
 async function loadCurrentUser() {
   try {
     const { data } = await supabaseClient.auth.getUser();
     currentUserId = data?.user?.id || null;
+    currentUserName = data?.user?.user_metadata?.full_name || "A student";
   } catch (err) {
     console.error("Error loading current user:", err);
+  }
+}
+
+// Helper: Load the set of partner profile IDs this user already sent
+// a study request to, so we can show "Request Sent" instead of the
+// button again (avoids duplicate requests).
+async function loadSentRequests() {
+  if (!currentUserId) return;
+  try {
+    const { data, error } = await supabaseClient
+      .from("study_partner_requests")
+      .select("partner_id")
+      .eq("sender_id", currentUserId);
+
+    if (error) {
+      console.error("Error loading sent requests:", error);
+      return;
+    }
+
+    sentRequestPartnerIds = new Set((data || []).map(r => String(r.partner_id)));
+  } catch (err) {
+    console.error("Sent requests exception:", err);
   }
 }
 
@@ -322,7 +401,19 @@ function renderPartners(data) {
     const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name || "S")}&background=124B57&color=8CE5ED`;
     const subjectsList = partner.subjects || [];
     const skillsList = partner.skills || [];
-    const isOwner = currentUserId && partner.user_id === currentUserId;
+    const isOwner = currentUserId && partner.user_id && String(partner.user_id).trim() === String(currentUserId).trim();
+
+    let requestButton = "";
+    if (!isOwner && partner.user_id) {
+      const alreadyRequested = sentRequestPartnerIds.has(String(partner.id));
+      requestButton = alreadyRequested
+        ? `<button class="btn-request btn-request-sent" disabled>
+             <i class="fa-solid fa-check icon-left"></i> Request Sent
+           </button>`
+        : `<button class="btn-request" onclick="sendPartnerRequest(${partner.id}, '${partner.user_id}')">
+             <i class="fa-solid fa-paper-plane icon-left"></i> Send Request
+           </button>`;
+    }
 
     const ownerActions = isOwner ? `
       <div class="card-owner-actions">
@@ -374,6 +465,7 @@ function renderPartners(data) {
         <div class="availability">
           <i class="fa-regular fa-clock"></i> <span>${partner.availability || ""}</span>
         </div>
+        ${requestButton}
       </div>
     `;
     partnersContainer.appendChild(card);
@@ -431,6 +523,7 @@ profileForm.addEventListener("submit", async (e) => {
   let error;
 
   if (editingPartnerId) {
+    partnerPayload.user_id = currentUserId; // re-attach ownership in case it was missing
     ({ error } = await supabaseClient
       .from("study_partners")
       .update(partnerPayload)
@@ -472,5 +565,6 @@ profileForm.addEventListener("submit", async (e) => {
 
 (async function init() {
   await loadCurrentUser();
+  await loadSentRequests();
   fetchPartners();
 })();

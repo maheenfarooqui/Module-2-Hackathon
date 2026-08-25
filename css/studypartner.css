@@ -593,6 +593,20 @@ input:focus, select:focus, textarea:focus {
 
   letter-spacing: 0.5px;
 
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+
+
+.icon-left {
+
+  margin-right: 8px;
+
 }
 
 
@@ -972,6 +986,88 @@ input:focus, select:focus, textarea:focus {
   border-top: 1px solid var(--accent-teal);
 
   padding-top: 0.85rem;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 0.75rem;
+
+  flex-wrap: wrap;
+
+}
+
+
+
+.btn-request {
+
+  background: transparent;
+
+  color: var(--accent-cyan);
+
+  border: 1px solid var(--accent-cyan);
+
+  border-radius: var(--sharp-border);
+
+  padding: 0.4rem 0.85rem;
+
+  font-family: var(--font-body);
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+
+  cursor: pointer;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  transition: all 0.2s ease;
+
+}
+
+
+
+.btn-request:hover {
+
+  background-color: var(--accent-cyan);
+
+  color: var(--bg-dark);
+
+  box-shadow: 0 4px 14px rgba(140, 229, 237, 0.3);
+
+}
+
+
+
+.btn-request-sent {
+
+  color: var(--text-muted);
+
+  border-color: var(--accent-teal);
+
+  cursor: default;
+
+  opacity: 0.8;
+
+}
+
+
+
+.btn-request-sent:hover {
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  box-shadow: none;
 
 }
 
