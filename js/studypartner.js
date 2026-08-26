@@ -186,8 +186,10 @@ function displayAvatarImage(url) {
 let partners = [];
 let currentUserId = null;
 let currentUserName = "A student";
+let currentUserAvatarUrl = null;
 let editingPartnerId = null;
 let sentRequestPartnerIds = new Set();
+let currentProfilePictureUrl = null; // resolved picture URL to save on submit
 
 // DOM Elements
 const partnersContainer = document.getElementById("partnersContainer");
@@ -198,6 +200,27 @@ const toggleFormBtn = document.getElementById("toggleFormBtn");
 const addProfileForm = document.getElementById("addProfileForm");
 const profileForm = document.getElementById("profileForm");
 const submitBtn = document.getElementById("submitBtn");
+const pictureInput = document.getElementById("pictureInput");
+const pictureAvatarPreview = document.getElementById("pictureAvatarPreview");
+
+// Helper: show a picture (URL or data URL) in the small circular preview,
+// falling back to the default person icon when there's nothing to show.
+function setPicturePreview(url) {
+  if (pictureAvatarPreview) {
+    pictureAvatarPreview.innerHTML = url
+      ? `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" />`
+      : `<i class="fa-solid fa-user"></i>`;
+  }
+}
+
+// Instant local preview when a new photo file is chosen
+pictureInput?.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => setPicturePreview(event.target.result);
+  reader.readAsDataURL(file);
+});
 
 // Toggle Form Visibility with GSAP
 toggleFormBtn.addEventListener("click", () => {
@@ -208,7 +231,16 @@ toggleFormBtn.addEventListener("click", () => {
     // Closing without submitting — reset back to "create" mode
     editingPartnerId = null;
     profileForm.reset();
+    document.getElementById("name").value = currentUserName;
+    currentProfilePictureUrl = null;
+    setPicturePreview(null);
     submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
+  } else if (!editingPartnerId) {
+    // Opening fresh (not editing) — default the picture to the account's
+    // own profile photo; the person can still choose a different one.
+    document.getElementById("name").value = currentUserName;
+    currentProfilePictureUrl = currentUserAvatarUrl;
+    setPicturePreview(currentUserAvatarUrl);
   }
 
   toggleFormBtn.innerHTML = isOpening
@@ -226,8 +258,9 @@ window.editPartnerProfile = function (id) {
   if (!partner) return;
 
   editingPartnerId = id;
-  document.getElementById("name").value = partner.name || "";
-  document.getElementById("picture").value = partner.picture || "";
+  document.getElementById("name").value = currentUserName;
+  currentProfilePictureUrl = partner.picture || null;
+  setPicturePreview(currentProfilePictureUrl);
   document.getElementById("experience").value = partner.experience || "";
   document.getElementById("availability").value = partner.availability || "";
   document.getElementById("subjects").value = (partner.subjects || []).join(", ");
@@ -327,6 +360,12 @@ async function loadCurrentUser() {
     const { data } = await supabaseClient.auth.getUser();
     currentUserId = data?.user?.id || null;
     currentUserName = data?.user?.user_metadata?.full_name || "A student";
+    currentUserAvatarUrl = data?.user?.user_metadata?.avatar_url || null;
+
+    const nameInput = document.getElementById("name");
+    if (nameInput) {
+      nameInput.value = currentUserName;
+    }
   } catch (err) {
     console.error("Error loading current user:", err);
   }
@@ -510,9 +549,37 @@ profileForm.addEventListener("submit", async (e) => {
     ? '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Updating...'
     : '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Publishing...';
 
+  // If a new photo file was chosen, upload it to Supabase Storage first
+  // and use the resulting public URL. Otherwise keep whatever picture
+  // was already resolved (account avatar on create, existing photo on edit).
+  const chosenFile = pictureInput?.files?.[0];
+  let resolvedPictureUrl = currentProfilePictureUrl;
+
+  if (chosenFile) {
+    const fileExt = chosenFile.name.split(".").pop();
+    const filePath = `${currentUserId}-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from("study-partner-profile-photos")
+      .upload(filePath, chosenFile, { upsert: true });
+
+    if (uploadError) {
+      console.error("Picture upload error:", uploadError);
+      alert("Failed to upload picture: " + uploadError.message);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
+      return;
+    }
+
+    const { data: publicUrlData } = supabaseClient.storage
+      .from("study-partner-profile-photos")
+      .getPublicUrl(filePath);
+    resolvedPictureUrl = publicUrlData.publicUrl;
+  }
+
   const partnerPayload = {
-    name: document.getElementById("name").value.trim(),
-    picture: document.getElementById("picture").value.trim() || null,
+    name: currentUserName,
+    picture: resolvedPictureUrl,
     experience: document.getElementById("experience").value,
     availability: document.getElementById("availability").value.trim(),
     subjects: document.getElementById("subjects").value.split(",").map(s => s.trim()).filter(Boolean),
@@ -545,6 +612,9 @@ profileForm.addEventListener("submit", async (e) => {
   }
 
   profileForm.reset();
+  document.getElementById("name").value = currentUserName;
+  currentProfilePictureUrl = null;
+  setPicturePreview(null);
   editingPartnerId = null;
   if (typeof animateFormToggle === "function") {
     animateFormToggle(false);
