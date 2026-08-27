@@ -186,3 +186,58 @@ document.addEventListener("DOMContentLoaded", () => {
     duration: 0.8,
   });
 });
+
+// =========================================================
+// FORGOT PASSWORD LOGIC (FIXED URL)
+// =========================================================
+const forgotPassBtn = document.getElementById("forgotPasswordBtn");
+
+if (forgotPassBtn) {
+  forgotPassBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const { value: email } = await Swal.fire({
+      title: "Reset Password",
+      input: "email",
+      inputLabel: "Enter your registered email address",
+      inputPlaceholder: "example@mail.com",
+      showCancelButton: true,
+      confirmButtonText: "Send Link",
+      confirmButtonColor: "#22d3ee",
+      cancelButtonColor: "#64748b",
+      inputValidator: (value) => {
+        if (!value) return "Email is required!";
+      },
+    });
+
+    if (email) {
+      try {
+        // Current window location ke hisab se dynamically absolute URL generate karein
+        const redirectUrl = `${window.location.origin}/reset-password.html`;
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: redirectUrl,
+        });
+
+        if (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid URL or Email Error",
+            text: error.message,
+            confirmButtonColor: "#22d3ee",
+          });
+          return;
+        }
+
+        Swal.fire({
+          icon: "success",
+          title: "Link Sent!",
+          text: "Password reset link has been sent to your email.",
+          confirmButtonColor: "#22d3ee",
+        });
+      } catch (err) {
+        console.error("Forgot Password Error:", err.message);
+      }
+    }
+  });
+}
