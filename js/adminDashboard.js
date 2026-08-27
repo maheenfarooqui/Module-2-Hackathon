@@ -112,7 +112,6 @@ async function fetchAdminDashboardStats() {
       totalComments,
       totalLikes,
     });
-
   } catch (error) {
     console.error("Error fetching admin dashboard statistics:", error.message);
   }
@@ -131,51 +130,66 @@ function renderAdminCharts(stats) {
       type: "bar",
       data: {
         labels: ["Users", "Posts", "Events", "Study Req."],
-        datasets: [{
-          label: "Total Count",
-          data: [stats.totalUsers, stats.totalPosts, stats.totalEvents, stats.totalStudy],
-                 backgroundColor: [
-  "#8CE5ED", // Accent Cyan (Bright)
-  "#124B57", // Accent Teal (Dark/Deep)
-  "#56737e", // Text Main (Soft Cyan-Blue)
-  "#3A8296"  // Mid Teal Accent (Slightly bright for contrast)
-],
-          borderRadius: 3,
-        }]
+        datasets: [
+          {
+            label: "Total Count",
+            data: [
+              stats.totalUsers,
+              stats.totalPosts,
+              stats.totalEvents,
+              stats.totalStudy,
+            ],
+            backgroundColor: [
+              "#8CE5ED", // Accent Cyan (Bright)
+              "#124B57", // Accent Teal (Dark/Deep)
+              "#56737e", // Text Main (Soft Cyan-Blue)
+              "#3A8296", // Mid Teal Accent (Slightly bright for contrast)
+            ],
+            borderRadius: 3,
+          },
+        ],
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { display: false }
+          legend: { display: false },
         },
         scales: {
           x: { ticks: { color: "#94a3b8" }, grid: { display: false } },
-          y: { ticks: { color: "#94a3b8" }, grid: { color: "#334155" }, beginAtZero: true }
-        }
-      }
+          y: {
+            ticks: { color: "#94a3b8" },
+            grid: { color: "#334155" },
+            beginAtZero: true,
+          },
+        },
+      },
     });
   }
 
- // 2. Doughnut Chart Setup (New Cyber Neon Colors & Custom Size)
-  const ctxPie = document.getElementById("engagementPieChart")?.getContext("2d");
+  // 2. Doughnut Chart Setup (New Cyber Neon Colors & Custom Size)
+  const ctxPie = document
+    .getElementById("engagementPieChart")
+    ?.getContext("2d");
   if (ctxPie) {
     engagementPieChartInstance = new Chart(ctxPie, {
       type: "doughnut",
       data: {
         labels: ["Posts", "Comments", "Likes"],
-        datasets: [{
-          data: [stats.totalPosts, stats.totalComments, stats.totalLikes],
-          // Modern Neon Dark Palette: Cyan, Electric Indigo, Coral Pink
-         backgroundColor: [
-  "#8CE5ED", // Accent Cyan (Bright)
-  "#124B57", // Accent Teal (Dark/Deep)
-  "#56737e", // Text Main (Soft Cyan-Blue)
-  "#3A8296"  // Mid Teal Accent (Slightly bright for contrast)
-],
-          hoverBackgroundColor: ["#4facfe", "#9333ea", "#f43f5e"],
-          borderWidth: 2,
-          borderColor: "#1e293b" // Card background se matching border
-        }]
+        datasets: [
+          {
+            data: [stats.totalPosts, stats.totalComments, stats.totalLikes],
+            // Modern Neon Dark Palette: Cyan, Electric Indigo, Coral Pink
+            backgroundColor: [
+              "#8CE5ED", // Accent Cyan (Bright)
+              "#124B57", // Accent Teal (Dark/Deep)
+              "#56737e", // Text Main (Soft Cyan-Blue)
+              "#3A8296", // Mid Teal Accent (Slightly bright for contrast)
+            ],
+            hoverBackgroundColor: ["#4facfe", "#9333ea", "#f43f5e"],
+            borderWidth: 2,
+            borderColor: "#1e293b", // Card background se matching border
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -184,15 +198,15 @@ function renderAdminCharts(stats) {
         plugins: {
           legend: {
             position: "bottom",
-            labels: { 
+            labels: {
               color: "#cbd5e1",
               font: { size: 12, family: "sans-serif" },
               padding: 15,
               usePointStyle: true, // Square ki jagah dots dikhane ke liye
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     });
   }
 }
@@ -302,7 +316,7 @@ loadUsersControl();
 
 //       adminModerationList.innerHTML += `
 //         <div class="moderation-user">
-          
+
 //           <div class="user-profile-circle shadow-cyan"
 //                style="width: 35px; height: 35px; font-size: 0.8rem;">
 //             ${fName.charAt(0).toUpperCase()}${lName ? lName.charAt(0).toUpperCase() : ""}
@@ -362,10 +376,11 @@ async function loadUsersControl() {
       const userId = userInfo.id; // Raw UUID from Supabase
 
       // Check Ban status
-      const isBanned = userInfo.banned_until && new Date(userInfo.banned_until) > new Date();
+      const isBanned =
+        userInfo.banned_until && new Date(userInfo.banned_until) > new Date();
 
       adminModerationList.innerHTML += `
-        <div class="moderation-user ${isBanned ? 'opacity-50' : ''}">
+        <div class="moderation-user ${isBanned ? "opacity-50" : ""}">
           
           <div class="user-profile-circle shadow-cyan"
                style="width: 35px; height: 35px; font-size: 0.8rem;">
@@ -374,7 +389,7 @@ async function loadUsersControl() {
 
           <div>
             <span class="fw-bold d-block text-white" style="font-size: 0.85rem;">
-              ${fName} ${lName} ${isBanned ? '<span class="badge bg-danger ms-1">Blocked</span>' : ''}
+              ${fName} ${lName} ${isBanned ? '<span class="badge bg-danger ms-1">Blocked</span>' : ""}
             </span>
 
             <span class="text-light opacity-50 d-block" style="font-size: 0.7rem;">
@@ -388,11 +403,11 @@ async function loadUsersControl() {
 
           <div class="d-flex gap-1">
             <button
-              class="btn btn-sm ${isBanned ? 'btn-outline-warning' : 'btn-outline-secondary'}"
+              class="btn btn-sm ${isBanned ? "btn-outline-warning" : "btn-outline-secondary"}"
               style="font-size: 0.75rem;"
               onclick="toggleBlockUser('${userId}', ${isBanned})"
             >
-              ${isBanned ? 'Unblock' : 'Block'}
+              ${isBanned ? "Unblock" : "Block"}
             </button>
 
             <button
@@ -415,11 +430,11 @@ async function loadUsersControl() {
 // Fixed Block Function
 async function toggleBlockUser(userId, currentBannedState) {
   try {
-    if (!userId || userId === 'undefined') {
+    if (!userId || userId === "undefined") {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Invalid User ID provided.'
+        icon: "error",
+        title: "Error",
+        text: "Invalid User ID provided.",
       });
       return;
     }
@@ -430,38 +445,38 @@ async function toggleBlockUser(userId, currentBannedState) {
     const confirmResult = await Swal.fire({
       title: `Are you sure?`,
       text: `Do you really want to ${actionText.toLowerCase()} this user?`,
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
       confirmButtonText: `Yes, ${actionText}!`,
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: currentBannedState ? '#ffc107' : '#dc3545'
+      cancelButtonText: "Cancel",
+      confirmButtonColor: currentBannedState ? "#ffc107" : "#dc3545",
     });
 
     if (!confirmResult.isConfirmed) return;
 
-    const bannedDuration = currentBannedState ? 'none' : '876000h';
+    const bannedDuration = currentBannedState ? "none" : "876000h";
 
     const { error } = await supabaseAdmin.auth.admin.updateUserById(
       userId.trim(),
-      { ban_duration: bannedDuration }
+      { ban_duration: bannedDuration },
     );
 
     if (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Action Failed',
-        text: error.message
+        icon: "error",
+        title: "Action Failed",
+        text: error.message,
       });
       return;
     }
 
     // Success Alert
     Swal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: `User has been ${currentBannedState ? 'unblocked' : 'blocked'} successfully.`,
+      icon: "success",
+      title: "Success!",
+      text: `User has been ${currentBannedState ? "unblocked" : "blocked"} successfully.`,
       timer: 2000,
-      showConfirmButton: false
+      showConfirmButton: false,
     });
 
     loadUsersControl();
@@ -469,8 +484,7 @@ async function toggleBlockUser(userId, currentBannedState) {
     console.error(err);
   }
 }
-window.toggleBlockUser =toggleBlockUser
-
+window.toggleBlockUser = toggleBlockUser;
 
 window.deleteUser = async function (userId) {
   const result = await Swal.fire({
@@ -590,7 +604,7 @@ window.deleteUser = async function (userId) {
 // }
 // loadRecentActivities();
 
-loadRecentActivities()
+loadRecentActivities();
 async function loadRecentActivities() {
   const adminActivityLogs = document.getElementById("adminActivityLogs");
 
@@ -675,15 +689,13 @@ async function loadRecentActivities() {
         </div>
       `;
     });
-
   } catch (error) {
     console.error(error);
   }
 }
-window.deletePost=deletePost
-window.editPost=editPost
+window.deletePost = deletePost;
+window.editPost = editPost;
 async function editPost(postId) {
-
   // Get current post
   const { data: post, error: fetchError } = await supabase
     .from("postApp")
@@ -731,49 +743,41 @@ async function editPost(postId) {
 
       return {
         title,
-        description
+        description,
       };
-    }
+    },
   });
 
   if (!formValues) return;
-
 
   // Update post
   const { error: updateError } = await supabase
     .from("postApp")
     .update({
       title: formValues.title,
-      description: formValues.description
+      description: formValues.description,
     })
     .eq("id", postId);
 
   if (updateError) {
     console.error("Error updating post:", updateError);
 
-    Swal.fire(
-      "Error",
-      "Could not update the post.",
-      "error"
-    );
+    Swal.fire("Error", "Could not update the post.", "error");
 
     return;
   }
-
 
   Swal.fire({
     icon: "success",
     title: "Post Updated!",
     timer: 1200,
-    showConfirmButton: false
+    showConfirmButton: false,
   });
-
 
   // Refresh activity list
   loadRecentActivities();
 }
 async function deletePost(postId) {
-
   const result = await Swal.fire({
     title: "Delete Post?",
     text: "This post will be permanently deleted.",
@@ -784,44 +788,31 @@ async function deletePost(postId) {
     confirmButtonText: "Yes, Delete",
     cancelButtonText: "Cancel",
 
-    confirmButtonColor: "#ef4444"
+    confirmButtonColor: "#ef4444",
   });
-
 
   // User cancelled
   if (!result.isConfirmed) {
     return;
   }
 
-
   // Delete from database
-  const { error } = await supabase
-    .from("postApp")
-    .delete()
-    .eq("id", postId);
-
+  const { error } = await supabase.from("postApp").delete().eq("id", postId);
 
   if (error) {
-
     console.error("Error deleting post:", error);
 
-    Swal.fire(
-      "Error",
-      "Could not delete the post.",
-      "error"
-    );
+    Swal.fire("Error", "Could not delete the post.", "error");
 
     return;
   }
-
 
   Swal.fire({
     icon: "success",
     title: "Deleted!",
     timer: 1200,
-    showConfirmButton: false
+    showConfirmButton: false,
   });
-
 
   // Refresh list
   loadRecentActivities();
@@ -979,4 +970,3 @@ window.rejectEvent = async function (id) {
   }
 };
 loadPendingEvents();
-

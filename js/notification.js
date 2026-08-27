@@ -215,7 +215,7 @@ function getNotificationIcon(type) {
       return "fa-chart-simple";
     case "announcement":
       return "fa-bullhorn";
-      case "study_partner":
+    case "study_partner":
       return "fa-user-graduate";
     default:
       return "fa-bell";
