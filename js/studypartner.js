@@ -5,6 +5,74 @@ const SUPABASE_ANON_KEY = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ==========================================================
+   THEMED ALERT HELPERS (SweetAlert2, matching QuadPulse theme)
+   ========================================================== */
+function notifyInfo(title, text, icon) {
+  if (typeof Swal === "undefined") {
+    alert(text || title);
+    return Promise.resolve();
+  }
+  return Swal.fire({
+    icon: icon || "info",
+    title,
+    text,
+    background: "#081d21",
+    color: "#ffffff",
+    confirmButtonColor: "#0e8388"
+  });
+}
+
+function notifySuccess(title, text) {
+  if (typeof Swal === "undefined") {
+    alert(title);
+    return Promise.resolve();
+  }
+  return Swal.fire({
+    icon: "success",
+    title,
+    text,
+    background: "#081d21",
+    color: "#ffffff",
+    confirmButtonColor: "#0e8388",
+    timer: 1800,
+    showConfirmButton: false
+  });
+}
+
+function notifyError(title, text) {
+  if (typeof Swal === "undefined") {
+    alert(text || title);
+    return Promise.resolve();
+  }
+  return Swal.fire({
+    icon: "error",
+    title,
+    text,
+    background: "#081d21",
+    color: "#ffffff",
+    confirmButtonColor: "#0e8388"
+  });
+}
+
+async function confirmAction(title, text, confirmButtonText) {
+  if (typeof Swal === "undefined") {
+    return confirm(text || title);
+  }
+  const result = await Swal.fire({
+    title,
+    text,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#0e8388",
+    cancelButtonColor: "#d33",
+    confirmButtonText: confirmButtonText || "Yes",
+    background: "#081d21",
+    color: "#ffffff"
+  });
+  return result.isConfirmed;
+}
+
+/* ==========================================================
    HEADER & PROFILE HANDLERS
    ========================================================== */
 document.addEventListener("DOMContentLoaded", function () {
@@ -126,11 +194,11 @@ async function handleProfilePicUpload(event) {
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    alert("Please select a valid image file!");
+    notifyError("Invalid File", "Please select a valid image file!");
     return;
   }
   if (file.size > 2 * 1024 * 1024) {
-    alert("File size must be under 2MB!");
+    notifyError("File Too Large", "File size must be under 2MB!");
     return;
   }
 
@@ -161,10 +229,10 @@ async function handleProfilePicUpload(event) {
 
     displayAvatarImage(avatarUrl);
     localStorage.setItem("userAvatar", avatarUrl);
-    alert("Profile picture updated successfully!");
+    notifySuccess("Updated!", "Profile picture updated successfully!");
   } catch (error) {
     console.error("Upload error:", error.message);
-    alert("Upload Failed: " + error.message);
+    notifyError("Upload Failed", error.message);
   }
 }
 
@@ -282,8 +350,12 @@ window.editPartnerProfile = function (id) {
 
 // Delete: remove the current user's own profile
 window.deletePartnerProfile = async function (id) {
-  const confirmAction = confirm("Are you sure you want to delete your study partner profile?");
-  if (!confirmAction) return;
+  const confirmed = await confirmAction(
+    "Are you sure?",
+    "This will permanently delete your study partner profile.",
+    "Yes, delete it"
+  );
+  if (!confirmed) return;
 
   const { error } = await supabaseClient
     .from("study_partners")
@@ -292,17 +364,18 @@ window.deletePartnerProfile = async function (id) {
 
   if (error) {
     console.error("Delete partner error:", error);
-    alert("Failed to delete profile: " + error.message);
+    notifyError("Failed!", "Failed to delete profile: " + error.message);
     return;
   }
 
+  notifySuccess("Deleted!", "Your study partner profile has been removed.");
   fetchPartners();
 };
 
 // Send Request: notify a study partner that this user wants to connect
 window.sendPartnerRequest = async function (partnerId, receiverId) {
   if (!currentUserId) {
-    alert("Please log in to send a study partner request.");
+    notifyInfo("Login Required", "Please log in to send a study partner request.");
     return;
   }
   if (receiverId === currentUserId) {
@@ -326,7 +399,7 @@ window.sendPartnerRequest = async function (partnerId, receiverId) {
 
     if (error) {
       console.error("Send request error:", error);
-      alert("Failed to send request: " + error.message);
+      notifyError("Failed!", "Failed to send request: " + error.message);
       return;
     }
 
@@ -347,9 +420,10 @@ window.sendPartnerRequest = async function (partnerId, receiverId) {
 
     sentRequestPartnerIds.add(String(partnerId));
     filterPartners();
+    notifySuccess("Request Sent!", "They'll be notified and can accept it from their dashboard.");
   } catch (err) {
     console.error("Send request exception:", err);
-    alert("Something went wrong sending the request.");
+    notifyError("Something Went Wrong", "Could not send the request. Please try again.");
   }
 };
 
@@ -479,7 +553,7 @@ function renderPartners(data) {
           />
           <div class="profile-info">
             <h3>${partner.name}</h3>
-            <span class="badge-level">${partner.experience}</span>
+            <span class="badge-level level-${(partner.experience || "").toLowerCase()}">${partner.experience}</span>
           </div>
         </div>
 
@@ -565,7 +639,7 @@ profileForm.addEventListener("submit", async (e) => {
 
     if (uploadError) {
       console.error("Picture upload error:", uploadError);
-      alert("Failed to upload picture: " + uploadError.message);
+      notifyError("Upload Failed", "Failed to upload picture: " + uploadError.message);
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
       return;
@@ -607,9 +681,11 @@ profileForm.addEventListener("submit", async (e) => {
 
   if (error) {
     console.error("Error saving profile:", error);
-    alert("Error saving profile: " + error.message);
+    notifyError("Failed!", "Error saving profile: " + error.message);
     return;
   }
+
+  const wasEditing = !!editingPartnerId;
 
   profileForm.reset();
   document.getElementById("name").value = currentUserName;
@@ -630,6 +706,10 @@ profileForm.addEventListener("submit", async (e) => {
   filterLevel.value = "";
 
   fetchPartners();
+  notifySuccess(
+    wasEditing ? "Profile Updated!" : "Profile Published!",
+    wasEditing ? "Your study partner profile has been updated." : "Your study partner profile is now live."
+  );
 });
 
 
