@@ -1,55 +1,69 @@
-// theme.js
-(function () {
-  function applyTheme() {
-    // 1. Storage se saved theme load karein
-    const savedTheme = localStorage.getItem("appTheme") || "dark";
-    if (savedTheme === "light") {
-      document.documentElement.classList.add("light");
+document.addEventListener("DOMContentLoaded", () => {
+
+  const themeToggle = document.createElement("button");
+
+  themeToggle.type = "button";
+  themeToggle.id = "theme-toggle";
+  themeToggle.className = "theme-toggle";
+
+  const themeIcon = document.createElement("i");
+  themeIcon.className = "fa-solid fa-sun";
+
+  themeToggle.appendChild(themeIcon);
+  document.body.appendChild(themeToggle);
+
+
+  function updateThemeButton(isLightMode) {
+
+    if (isLightMode) {
+      themeIcon.className = "fa-solid fa-moon";
+      themeToggle.setAttribute(
+        "aria-label",
+        "Switch to dark mode"
+      );
+      themeToggle.setAttribute(
+        "title",
+        "Switch to dark mode"
+      );
+
     } else {
-      document.documentElement.classList.remove("light");
+      themeIcon.className = "fa-solid fa-sun";
+      themeToggle.setAttribute(
+        "aria-label",
+        "Switch to light mode"
+      );
+      themeToggle.setAttribute(
+        "title",
+        "Switch to light mode"
+      );
     }
-
-    // 2. Existing Button check ya naya Create
-    let toggleBtn = document.getElementById("globalThemeToggleBtn");
-    if (!toggleBtn) {
-      toggleBtn = document.createElement("button");
-      toggleBtn.id = "globalThemeToggleBtn";
-      toggleBtn.style.cssText = `
-        position: fixed !important;
-        bottom: 24px !important;
-        right: 24px !important;
-        width: 50px !important;
-        height: 50px !important;
-        border-radius: 50% !important;
-        background-color: #0f172a !important;
-        border: 2px solid #14b8a6 !important;
-        color: #14b8a6 !important;
-        font-size: 20px !important;
-        cursor: pointer !important;
-        z-index: 9999999 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
-      `;
-      document.body.appendChild(toggleBtn);
-    }
-
-    // Update Icon
-    const isLight = document.documentElement.classList.contains("light");
-    toggleBtn.innerHTML = isLight ? "🌙" : "☀️";
-
-    // Click Listener
-    toggleBtn.onclick = function () {
-      const isCurrentlyLight = document.documentElement.classList.toggle("light");
-      localStorage.setItem("appTheme", isCurrentlyLight ? "light" : "dark");
-      toggleBtn.innerHTML = isCurrentlyLight ? "🌙" : "☀️";
-    };
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", applyTheme);
+
+  // Saved theme check
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "light") {
+    document.body.classList.add("light-mode");
+    updateThemeButton(true);
   } else {
-    applyTheme();
+    document.body.classList.remove("light-mode");
+    updateThemeButton(false);
   }
-})();
+
+
+  // Toggle
+  themeToggle.addEventListener("click", () => {
+
+    const isLightMode =
+      document.body.classList.toggle("light-mode");
+
+    localStorage.setItem(
+      "theme",
+      isLightMode ? "light" : "dark"
+    );
+
+    updateThemeButton(isLightMode);
+  });
+
+});

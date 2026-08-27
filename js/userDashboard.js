@@ -561,3 +561,6 @@ function getTimeAgo(date) {
   return `${days} days ago`;
 }
  loadAnnouncements()
+
+
+//  std
