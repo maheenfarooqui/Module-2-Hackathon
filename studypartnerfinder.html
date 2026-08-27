@@ -11,14 +11,17 @@
       href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@600;700&display=swap"
       rel="stylesheet"
     />
+
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/notification.css" />
+    <link rel="stylesheet" href="css/studypartner.css" />
+
+    <!-- font awesome -->
      <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="css/dashboard.css" />
-    <link rel="stylesheet" href="css/notification.css" />
-    <link rel="stylesheet" href="css/studypartner.css" />
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -120,7 +123,7 @@
 
     
     <nav class="nav-menu" id="navMenu">
-      <a href="dashboard.html" class="nav-link ">Dashboard</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
       <a href="communitypost.html" class="nav-link">Posts</a>
       <a href="event.html" class="nav-link">Events</a>
       <a href="studypartnerfinder.html" class="nav-link active">Study Partners</a>
@@ -197,15 +200,17 @@
   </div>
 </header>
 
-    <div class="container">
-      <header class="header-anim">
+    <header class="header-anim">
+      <div class="header-anim-inner">
         <h1>Study Partner Finder</h1>
         <p>Connect with peers, collaborate on subjects, and excel together.</p>
-      </header>
+      </div>
+    </header>
 
+    <div class="container">
       <div class="controls-wrapper">
         <div class="card-box filter-card-anim">
-          <h2 class="card-title">Search & Filter Partners</h2>
+          <h2 class="card-title"><i class="fa-solid fa-sliders"></i> Search &amp; Filter Partners</h2>
           <div class="filters-grid">
             <div class="form-group">
               <label for="filterSubject">Subject</label>
@@ -236,33 +241,38 @@
         </div>
 
         <div class="card-box action-card action-card-anim">
+          <div class="action-card-icon"><i class="fa-solid fa-user-group"></i></div>
           <h2 class="card-title no-border">Join the Network</h2>
           <p class="sub-text">Create your profile to let others find you.</p>
-          <button class="btn" id="toggleFormBtn">Add My Profile</button>
+          <button class="btn" id="toggleFormBtn"><i class="fa-solid fa-user-plus icon-left"></i> Add My Profile</button>
         </div>
       </div>
 
       <div class="card-box" id="addProfileForm">
-        <h2 class="card-title">Add Your Study Profile</h2>
+        <h2 class="card-title"><i class="fa-solid fa-id-card"></i> Add Your Study Profile</h2>
         <form id="profileForm">
           <div class="form-grid">
             <div class="form-group">
-              <label for="name">Full Name *</label>
+              <label for="name">Full Name</label>
               <input
                 type="text"
                 id="name"
-                required
-                placeholder="e.g. Sarah Jenkins"
+                readonly
+                placeholder="Loading your name..."
               />
             </div>
 
             <div class="form-group">
-              <label for="picture">Profile Picture URL</label>
-              <input
-                type="url"
-                id="picture"
-                placeholder="https://example.com/photo.jpg"
-              />
+              <label for="pictureInput">Profile Picture</label>
+              <div class="avatar-upload-row">
+                <div class="avatar-upload-preview" id="pictureAvatarPreview">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <label for="pictureInput" class="btn-upload-photo">
+                  <i class="fa-solid fa-camera icon-left"></i> Choose Photo
+                </label>
+                <input type="file" id="pictureInput" accept="image/*" hidden />
+              </div>
             </div>
 
             <div class="form-group">
@@ -317,7 +327,7 @@
           </div>
 
           <button type="submit" class="btn btn-submit" id="submitBtn">
-            Publish Profile
+            <i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile
           </button>
         </form>
       </div>
@@ -327,6 +337,8 @@
 
     <script src="js/notification.js"></script>
     <script src="js/studypartner.js"></script>
-    <script type="module" src="js/animationjs/animationstdpartner.js"></script>
+    <script src="js/animationjs/animationstdpartner.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   </body>
 </html>

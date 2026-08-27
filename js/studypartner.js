@@ -5,6 +5,74 @@ const SUPABASE_ANON_KEY = "sb_publishable_dOaRFmzPIgKgPV5pZDfq0w_vL3GxXdO";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ==========================================================
+   THEMED ALERT HELPERS (SweetAlert2, matching QuadPulse theme)
+   ========================================================== */
+function notifyInfo(title, text, icon) {
+  if (typeof Swal === "undefined") {
+    alert(text || title);
+    return Promise.resolve();
+  }
+  return Swal.fire({
+    icon: icon || "info",
+    title,
+    text,
+    background: "#081d21",
+    color: "#ffffff",
+    confirmButtonColor: "#0e8388"
+  });
+}
+
+function notifySuccess(title, text) {
+  if (typeof Swal === "undefined") {
+    alert(title);
+    return Promise.resolve();
+  }
+  return Swal.fire({
+    icon: "success",
+    title,
+    text,
+    background: "#081d21",
+    color: "#ffffff",
+    confirmButtonColor: "#0e8388",
+    timer: 1800,
+    showConfirmButton: false
+  });
+}
+
+function notifyError(title, text) {
+  if (typeof Swal === "undefined") {
+    alert(text || title);
+    return Promise.resolve();
+  }
+  return Swal.fire({
+    icon: "error",
+    title,
+    text,
+    background: "#081d21",
+    color: "#ffffff",
+    confirmButtonColor: "#0e8388"
+  });
+}
+
+async function confirmAction(title, text, confirmButtonText) {
+  if (typeof Swal === "undefined") {
+    return confirm(text || title);
+  }
+  const result = await Swal.fire({
+    title,
+    text,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#0e8388",
+    cancelButtonColor: "#d33",
+    confirmButtonText: confirmButtonText || "Yes",
+    background: "#081d21",
+    color: "#ffffff"
+  });
+  return result.isConfirmed;
+}
+
+/* ==========================================================
    HEADER & PROFILE HANDLERS
    ========================================================== */
 document.addEventListener("DOMContentLoaded", function () {
@@ -130,11 +198,11 @@ async function handleProfilePicUpload(event) {
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
-    alert("Please select a valid image file!");
+    notifyError("Invalid File", "Please select a valid image file!");
     return;
   }
   if (file.size > 2 * 1024 * 1024) {
-    alert("File size must be under 2MB!");
+    notifyError("File Too Large", "File size must be under 2MB!");
     return;
   }
 
@@ -167,10 +235,10 @@ async function handleProfilePicUpload(event) {
 
     displayAvatarImage(avatarUrl);
     localStorage.setItem("userAvatar", avatarUrl);
-    alert("Profile picture updated successfully!");
+    notifySuccess("Updated!", "Profile picture updated successfully!");
   } catch (error) {
     console.error("Upload error:", error.message);
-    alert("Upload Failed: " + error.message);
+    notifyError("Upload Failed", error.message);
   }
 }
 
@@ -190,6 +258,12 @@ function displayAvatarImage(url) {
    STUDY PARTNER FINDER CORE LOGIC
    ========================================================== */
 let partners = [];
+let currentUserId = null;
+let currentUserName = "A student";
+let currentUserAvatarUrl = null;
+let editingPartnerId = null;
+let sentRequestPartnerIds = new Set();
+let currentProfilePictureUrl = null; // resolved picture URL to save on submit
 
 // DOM Elements
 const partnersContainer = document.getElementById("partnersContainer");
@@ -200,11 +274,48 @@ const toggleFormBtn = document.getElementById("toggleFormBtn");
 const addProfileForm = document.getElementById("addProfileForm");
 const profileForm = document.getElementById("profileForm");
 const submitBtn = document.getElementById("submitBtn");
+const pictureInput = document.getElementById("pictureInput");
+const pictureAvatarPreview = document.getElementById("pictureAvatarPreview");
+
+// Helper: show a picture (URL or data URL) in the small circular preview,
+// falling back to the default person icon when there's nothing to show.
+function setPicturePreview(url) {
+  if (pictureAvatarPreview) {
+    pictureAvatarPreview.innerHTML = url
+      ? `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" />`
+      : `<i class="fa-solid fa-user"></i>`;
+  }
+}
+
+// Instant local preview when a new photo file is chosen
+pictureInput?.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => setPicturePreview(event.target.result);
+  reader.readAsDataURL(file);
+});
 
 // Toggle Form Visibility with GSAP
 toggleFormBtn.addEventListener("click", () => {
   const isOpening = !addProfileForm.classList.contains("active");
   addProfileForm.classList.toggle("active");
+
+  if (!isOpening) {
+    // Closing without submitting — reset back to "create" mode
+    editingPartnerId = null;
+    profileForm.reset();
+    document.getElementById("name").value = currentUserName;
+    currentProfilePictureUrl = null;
+    setPicturePreview(null);
+    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
+  } else if (!editingPartnerId) {
+    // Opening fresh (not editing) — default the picture to the account's
+    // own profile photo; the person can still choose a different one.
+    document.getElementById("name").value = currentUserName;
+    currentProfilePictureUrl = currentUserAvatarUrl;
+    setPicturePreview(currentUserAvatarUrl);
+  }
 
   toggleFormBtn.innerHTML = isOpening
     ? '<i class="fa-solid fa-xmark icon-left"></i> Close Form'
@@ -214,6 +325,153 @@ toggleFormBtn.addEventListener("click", () => {
     animateFormToggle(isOpening);
   }
 });
+
+// Edit: prefill the form with this partner's existing data and switch to update mode
+window.editPartnerProfile = function (id) {
+  const partner = partners.find(p => p.id === id);
+  if (!partner) return;
+
+  editingPartnerId = id;
+  document.getElementById("name").value = currentUserName;
+  currentProfilePictureUrl = partner.picture || null;
+  setPicturePreview(currentProfilePictureUrl);
+  document.getElementById("experience").value = partner.experience || "";
+  document.getElementById("availability").value = partner.availability || "";
+  document.getElementById("subjects").value = (partner.subjects || []).join(", ");
+  document.getElementById("skills").value = (partner.skills || []).join(", ");
+  document.getElementById("bio").value = partner.intro || "";
+
+  submitBtn.innerHTML = '<i class="fa-solid fa-pen icon-left"></i> Update Profile';
+
+  if (!addProfileForm.classList.contains("active")) {
+    addProfileForm.classList.add("active");
+    toggleFormBtn.innerHTML = '<i class="fa-solid fa-xmark icon-left"></i> Close Form';
+    if (typeof animateFormToggle === "function") {
+      animateFormToggle(true);
+    }
+  }
+
+  addProfileForm.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+// Delete: remove the current user's own profile
+window.deletePartnerProfile = async function (id) {
+  const confirmed = await confirmAction(
+    "Are you sure?",
+    "This will permanently delete your study partner profile.",
+    "Yes, delete it"
+  );
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from("study_partners")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Delete partner error:", error);
+    notifyError("Failed!", "Failed to delete profile: " + error.message);
+    return;
+  }
+
+  notifySuccess("Deleted!", "Your study partner profile has been removed.");
+  fetchPartners();
+};
+
+// Send Request: notify a study partner that this user wants to connect
+window.sendPartnerRequest = async function (partnerId, receiverId) {
+  if (!currentUserId) {
+    notifyInfo("Login Required", "Please log in to send a study partner request.");
+    return;
+  }
+  if (receiverId === currentUserId) {
+    return; // safety guard, shouldn't happen since button is hidden on own card
+  }
+  if (sentRequestPartnerIds.has(String(partnerId))) {
+    return; // already requested
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("study_partner_requests")
+      .insert([
+        {
+          sender_id: currentUserId,
+          receiver_id: receiverId,
+          partner_id: partnerId,
+          status: "pending"
+        }
+      ]);
+
+    if (error) {
+      console.error("Send request error:", error);
+      notifyError("Failed!", "Failed to send request: " + error.message);
+      return;
+    }
+
+    // Best-effort notification for the receiver — if this fails, the
+    // request itself has still gone through, so we don't alert on it.
+    try {
+      await supabaseClient.from("notifications").insert([
+        {
+          user_id: receiverId,
+          type: "study_request",
+          text: `<b>${currentUserName}</b> sent you a study partner request.`,
+          is_read: false
+        }
+      ]);
+    } catch (notifErr) {
+      console.error("Request notification error:", notifErr);
+    }
+
+    sentRequestPartnerIds.add(String(partnerId));
+    filterPartners();
+    notifySuccess("Request Sent!", "They'll be notified and can accept it from their dashboard.");
+  } catch (err) {
+    console.error("Send request exception:", err);
+    notifyError("Something Went Wrong", "Could not send the request. Please try again.");
+  }
+};
+
+// Helper: Know which logged-in user is viewing, so we can show
+// Edit/Delete controls only on that user's own profile card.
+async function loadCurrentUser() {
+  try {
+    const { data } = await supabaseClient.auth.getUser();
+    currentUserId = data?.user?.id || null;
+    currentUserName = data?.user?.user_metadata?.full_name || "A student";
+    currentUserAvatarUrl = data?.user?.user_metadata?.avatar_url || null;
+
+    const nameInput = document.getElementById("name");
+    if (nameInput) {
+      nameInput.value = currentUserName;
+    }
+  } catch (err) {
+    console.error("Error loading current user:", err);
+  }
+}
+
+// Helper: Load the set of partner profile IDs this user already sent
+// a study request to, so we can show "Request Sent" instead of the
+// button again (avoids duplicate requests).
+async function loadSentRequests() {
+  if (!currentUserId) return;
+  try {
+    const { data, error } = await supabaseClient
+      .from("study_partner_requests")
+      .select("partner_id")
+      .eq("sender_id", currentUserId);
+
+    if (error) {
+      console.error("Error loading sent requests:", error);
+      return;
+    }
+
+    sentRequestPartnerIds = new Set((data || []).map(r => String(r.partner_id)));
+  } catch (err) {
+    console.error("Sent requests exception:", err);
+  }
+}
 
 // Fetch Data from Supabase
 async function fetchPartners() {
@@ -262,10 +520,35 @@ function renderPartners(data) {
     const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name || "S")}&background=124B57&color=8CE5ED`;
     const subjectsList = partner.subjects || [];
     const skillsList = partner.skills || [];
+    const isOwner = currentUserId && partner.user_id && String(partner.user_id).trim() === String(currentUserId).trim();
+
+    let requestButton = "";
+    if (!isOwner && partner.user_id) {
+      const alreadyRequested = sentRequestPartnerIds.has(String(partner.id));
+      requestButton = alreadyRequested
+        ? `<button class="btn-request btn-request-sent" disabled>
+             <i class="fa-solid fa-check icon-left"></i> Request Sent
+           </button>`
+        : `<button class="btn-request" onclick="sendPartnerRequest(${partner.id}, '${partner.user_id}')">
+             <i class="fa-solid fa-paper-plane icon-left"></i> Send Request
+           </button>`;
+    }
+
+    const ownerActions = isOwner ? `
+      <div class="card-owner-actions">
+        <button class="btn-icon" onclick="editPartnerProfile(${partner.id})" title="Edit your profile">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="btn-icon btn-icon-danger" onclick="deletePartnerProfile(${partner.id})" title="Delete your profile">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    ` : "";
 
     const card = document.createElement("div");
     card.className = "partner-card";
     card.innerHTML = `
+      ${ownerActions}
       <div>
         <div class="profile-header">
           <img 
@@ -276,7 +559,7 @@ function renderPartners(data) {
           />
           <div class="profile-info">
             <h3>${partner.name}</h3>
-            <span class="badge-level">${partner.experience}</span>
+            <span class="badge-level level-${(partner.experience || "").toLowerCase()}">${partner.experience}</span>
           </div>
         </div>
 
@@ -301,6 +584,7 @@ function renderPartners(data) {
         <div class="availability">
           <i class="fa-regular fa-clock"></i> <span>${partner.availability || ""}</span>
         </div>
+        ${requestButton}
       </div>
     `;
     partnersContainer.appendChild(card);
@@ -345,12 +629,39 @@ profileForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   submitBtn.disabled = true;
-  submitBtn.innerHTML =
-    '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Publishing...';
+  submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin icon-left"></i> Publishing...';
 
-  const newPartner = {
-    name: document.getElementById("name").value.trim(),
-    picture: document.getElementById("picture").value.trim() || null,
+  // If a new photo file was chosen, upload it to Supabase Storage first
+  // and use the resulting public URL. Otherwise keep whatever picture
+  // was already resolved (account avatar on create, existing photo on edit).
+  const chosenFile = pictureInput?.files?.[0];
+  let resolvedPictureUrl = currentProfilePictureUrl;
+
+  if (chosenFile) {
+    const fileExt = chosenFile.name.split(".").pop();
+    const filePath = `${currentUserId}-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from("study-partner-profile-photos")
+      .upload(filePath, chosenFile, { upsert: true });
+
+    if (uploadError) {
+      console.error("Picture upload error:", uploadError);
+      notifyError("Upload Failed", "Failed to upload picture: " + uploadError.message);
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
+      return;
+    }
+
+    const { data: publicUrlData } = supabaseClient.storage
+      .from("study-partner-profile-photos")
+      .getPublicUrl(filePath);
+    resolvedPictureUrl = publicUrlData.publicUrl;
+  }
+
+  const partnerPayload = {
+    name: currentUserName,
+    picture: resolvedPictureUrl,
     experience: document.getElementById("experience").value,
     availability: document.getElementById("availability").value.trim(),
     subjects: document
@@ -366,65 +677,58 @@ profileForm.addEventListener("submit", async (e) => {
     intro: document.getElementById("bio").value.trim(),
   };
 
-  const { error } = await supabaseClient
-    .from("study_partners")
-    .insert([newPartner]);
+  let error;
+
+  if (editingPartnerId) {
+    partnerPayload.user_id = currentUserId; // re-attach ownership in case it was missing
+    ({ error } = await supabaseClient
+      .from("study_partners")
+      .update(partnerPayload)
+      .eq("id", editingPartnerId));
+  } else {
+    partnerPayload.user_id = currentUserId;
+    ({ error } = await supabaseClient
+      .from("study_partners")
+      .insert([partnerPayload]));
+  }
 
   submitBtn.disabled = false;
   submitBtn.innerHTML =
     '<i class="fa-solid fa-paper-plane icon-left"></i> Publish Profile';
 
   if (error) {
-    console.error("Error inserting data:", error);
-    alert("Error publishing profile: " + error.message);
+    console.error("Error saving profile:", error);
+    notifyError("Failed!", "Error saving profile: " + error.message);
     return;
   }
 
-  // Study Partner Form Submit Event Handler ke andar:
-  try {
-    // 1. Aapka Study Partner Database Insert Code
-    const { data: newPartner, error } = await _supabase
-      .from("study_partners") // Aapka table name
-      .insert([
-        {
-          user_id: notificationUserId, // Ya current user ki ID
-          subject: subjectInputVal,
-          description: descInputVal,
-          // baki fields...
-        },
-      ]);
-
-    if (error) throw error;
-
-    // -------------------------------------------------------------
-    // 2. BROADCAST NOTIFICATION (Sub Users Ko Notification Jayega)
-    // -------------------------------------------------------------
-    const userName =
-      typeof currentUserFname !== "undefined" && currentUserFname
-        ? `${currentUserFname} ${currentUserLname || ""}`.trim()
-        : "Someone";
-
-    if (typeof createNotification === "function") {
-      await createNotification({
-        targetUserId: null, // NULL broadcast ke liye taake sabhi users ko notification miley
-        type: "study_partner",
-        text: `🎓 <b>${userName}</b> added a new study partner request for <b>${subjectInputVal || "a subject"}</b>`,
-      });
-    }
-    // -------------------------------------------------------------
-
-    console.log("Study Partner created & Notification sent!");
-  } catch (err) {
-    console.error("Study Partner Insert Error:", err.message);
-  }
-
   profileForm.reset();
+  document.getElementById("name").value = currentUserName;
+  currentProfilePictureUrl = null;
+  setPicturePreview(null);
+  editingPartnerId = null;
   if (typeof animateFormToggle === "function") {
     animateFormToggle(false);
   }
   addProfileForm.classList.remove("active");
-  toggleFormBtn.textContent = "Add My Profile";
+  toggleFormBtn.innerHTML = '<i class="fa-solid fa-user-plus icon-left"></i> Add My Profile';
+
+  // Reset any active filters so the newly saved profile is guaranteed
+  // to be visible right away, even if a search/filter was active that
+  // would otherwise hide it.
+  filterSubject.value = "";
+  filterSkill.value = "";
+  filterLevel.value = "";
+
   fetchPartners();
+  notifySuccess(
+    wasEditing ? "Profile Updated!" : "Profile Published!",
+    wasEditing ? "Your study partner profile has been updated." : "Your study partner profile is now live."
+  );
 });
 
-fetchPartners();
+(async function init() {
+  await loadCurrentUser();
+  await loadSentRequests();
+  fetchPartners();
+})();
