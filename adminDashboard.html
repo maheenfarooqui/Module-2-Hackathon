@@ -247,6 +247,21 @@
             </div>
           </div>
         </div>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+  <!-- Chart 1: Bar Chart for Activity Stats -->
+  <div style="flex: 1; min-width: 300px; background: #0B282E; padding: 20px; border-radius: 0px; border: 1px solid #124b57; margin-bottom: 15px;">
+    <h5 style="color: #22d3ee; margin-bottom: 15px;">Dashboard Overview</h5>
+    <canvas id="statsBarChart"></canvas>
+  </div>
+
+  <!-- Chart 2: Doughnut Chart for Engagement Breakdown -->
+  <div style="flex: 1; min-width: 300px; background:#0B282E; padding: 20px; border-radius: 0px; border: 1px solid #124b57;  margin-bottom: 15px;">
+    <h5 style="color: #22d3ee; margin-bottom: 15px;">Engagement Breakdown</h5>
+   <div style="max-width: 250px; margin: 0 auto;">
+    <canvas id="engagementPieChart"></canvas>
+  </div>
+  </div>
+</div>
 
         <!-- CONTENT GRID -->
 
@@ -385,9 +400,11 @@
         </div>
       </main>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script type="module" src="js/adminDashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
   </body>
 </html>

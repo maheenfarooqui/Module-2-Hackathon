@@ -6,50 +6,194 @@ const service_role =
 var supabase = createClient(supbaseUrl, supbaseKey);
 const supabaseAdmin = createClient(supbaseUrl, service_role);
 // Function to fetch counts from Supabase tables
+// async function fetchAdminDashboardStats() {
+//   try {
+//     // 1. Fetch Total Users (Assuming 'profiles' table exists, otherwise checks auth/users via profiles)
+//     const {
+//       data: { users },
+//       error,
+//     } = await supabaseAdmin.auth.admin.listUsers();
+
+//     // 2. Fetch Total Posts (postApp)
+//     const { count: postsCount, error: postsErr } = await supabase
+//       .from("postApp")
+//       .select("*", { count: "exact", head: true });
+
+//     // 3. Fetch Total Events (events)
+//     const { count: eventsCount, error: eventsErr } = await supabase
+//       .from("events")
+//       .select("*", { count: "exact", head: true });
+
+//     // 4. Fetch Study Partners Requests (study_partners)
+//     const { count: studyCount, error: studyErr } = await supabase
+//       .from("study_partners")
+//       .select("*", { count: "exact", head: true });
+
+//     // 5. Fetch Total Comments (commentsApp)
+//     const { count: commentsCount, error: commentsErr } = await supabase
+//       .from("commentsApp")
+//       .select("*", { count: "exact", head: true });
+
+//     // 6. Fetch Total Likes (likesapp)
+//     const { count: likesCount, error: likesErr } = await supabase
+//       .from("likesApp")
+//       .select("*", { count: "exact", head: true });
+
+//     // --- DOM Update ---
+//     document.getElementById("totalUsersCount").innerText =
+//       `${users.length}` || 0;
+//     document.getElementById("totalPostsCount").innerText = postsCount || 0;
+//     document.getElementById("totalEventsCount").innerText = eventsCount || 0;
+//     document.getElementById("studyPartnersCount").innerText = studyCount || 0;
+//     document.getElementById("totalCommentsCount").innerText =
+//       commentsCount || 0;
+//     document.getElementById("totalLikesCount").innerText = likesCount || 0;
+//   } catch (error) {
+//     console.error("Error fetching admin dashboard statistics:", error.message);
+//   }
+// }
+// Chart Instances save rakhne ke liye variables
+let statsBarChartInstance = null;
+let engagementPieChartInstance = null;
+
 async function fetchAdminDashboardStats() {
   try {
-    // 1. Fetch Total Users (Assuming 'profiles' table exists, otherwise checks auth/users via profiles)
+    // 1. Fetch Total Users
     const {
       data: { users },
-      error,
     } = await supabaseAdmin.auth.admin.listUsers();
 
-    // 2. Fetch Total Posts (postApp)
-    const { count: postsCount, error: postsErr } = await supabase
+    // 2. Fetch Total Posts
+    const { count: postsCount } = await supabase
       .from("postApp")
       .select("*", { count: "exact", head: true });
 
-    // 3. Fetch Total Events (events)
-    const { count: eventsCount, error: eventsErr } = await supabase
+    // 3. Fetch Total Events
+    const { count: eventsCount } = await supabase
       .from("events")
       .select("*", { count: "exact", head: true });
 
-    // 4. Fetch Study Partners Requests (study_partners)
-    const { count: studyCount, error: studyErr } = await supabase
+    // 4. Fetch Study Partners Requests
+    const { count: studyCount } = await supabase
       .from("study_partners")
       .select("*", { count: "exact", head: true });
 
-    // 5. Fetch Total Comments (commentsApp)
-    const { count: commentsCount, error: commentsErr } = await supabase
+    // 5. Fetch Total Comments
+    const { count: commentsCount } = await supabase
       .from("commentsApp")
       .select("*", { count: "exact", head: true });
 
-    // 6. Fetch Total Likes (likesapp)
-    const { count: likesCount, error: likesErr } = await supabase
+    // 6. Fetch Total Likes
+    const { count: likesCount } = await supabase
       .from("likesApp")
       .select("*", { count: "exact", head: true });
 
     // --- DOM Update ---
-    document.getElementById("totalUsersCount").innerText =
-      `${users.length}` || 0;
-    document.getElementById("totalPostsCount").innerText = postsCount || 0;
-    document.getElementById("totalEventsCount").innerText = eventsCount || 0;
-    document.getElementById("studyPartnersCount").innerText = studyCount || 0;
-    document.getElementById("totalCommentsCount").innerText =
-      commentsCount || 0;
-    document.getElementById("totalLikesCount").innerText = likesCount || 0;
+    const totalUsers = users ? users.length : 0;
+    const totalPosts = postsCount || 0;
+    const totalEvents = eventsCount || 0;
+    const totalStudy = studyCount || 0;
+    const totalComments = commentsCount || 0;
+    const totalLikes = likesCount || 0;
+
+    document.getElementById("totalUsersCount").innerText = totalUsers;
+    document.getElementById("totalPostsCount").innerText = totalPosts;
+    document.getElementById("totalEventsCount").innerText = totalEvents;
+    document.getElementById("studyPartnersCount").innerText = totalStudy;
+    document.getElementById("totalCommentsCount").innerText = totalComments;
+    document.getElementById("totalLikesCount").innerText = totalLikes;
+
+    // --- CHARTS INITIALIZATION ---
+    renderAdminCharts({
+      totalUsers,
+      totalPosts,
+      totalEvents,
+      totalStudy,
+      totalComments,
+      totalLikes,
+    });
+
   } catch (error) {
     console.error("Error fetching admin dashboard statistics:", error.message);
+  }
+}
+
+// Helper function: Render Charts
+function renderAdminCharts(stats) {
+  // Clear previous instances if re-fetching
+  if (statsBarChartInstance) statsBarChartInstance.destroy();
+  if (engagementPieChartInstance) engagementPieChartInstance.destroy();
+
+  // 1. Bar Chart Setup
+  const ctxBar = document.getElementById("statsBarChart")?.getContext("2d");
+  if (ctxBar) {
+    statsBarChartInstance = new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: ["Users", "Posts", "Events", "Study Req."],
+        datasets: [{
+          label: "Total Count",
+          data: [stats.totalUsers, stats.totalPosts, stats.totalEvents, stats.totalStudy],
+                 backgroundColor: [
+  "#8CE5ED", // Accent Cyan (Bright)
+  "#124B57", // Accent Teal (Dark/Deep)
+  "#56737e", // Text Main (Soft Cyan-Blue)
+  "#3A8296"  // Mid Teal Accent (Slightly bright for contrast)
+],
+          borderRadius: 3,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: { ticks: { color: "#94a3b8" }, grid: { display: false } },
+          y: { ticks: { color: "#94a3b8" }, grid: { color: "#334155" }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+ // 2. Doughnut Chart Setup (New Cyber Neon Colors & Custom Size)
+  const ctxPie = document.getElementById("engagementPieChart")?.getContext("2d");
+  if (ctxPie) {
+    engagementPieChartInstance = new Chart(ctxPie, {
+      type: "doughnut",
+      data: {
+        labels: ["Posts", "Comments", "Likes"],
+        datasets: [{
+          data: [stats.totalPosts, stats.totalComments, stats.totalLikes],
+          // Modern Neon Dark Palette: Cyan, Electric Indigo, Coral Pink
+         backgroundColor: [
+  "#8CE5ED", // Accent Cyan (Bright)
+  "#124B57", // Accent Teal (Dark/Deep)
+  "#56737e", // Text Main (Soft Cyan-Blue)
+  "#3A8296"  // Mid Teal Accent (Slightly bright for contrast)
+],
+          hoverBackgroundColor: ["#4facfe", "#9333ea", "#f43f5e"],
+          borderWidth: 2,
+          borderColor: "#1e293b" // Card background se matching border
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: "50%", // Ring ko patla (sleek) aur clean look dene ke liye
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { 
+              color: "#cbd5e1",
+              font: { size: 12, family: "sans-serif" },
+              padding: 15,
+              usePointStyle: true, // Square ki jagah dots dikhane ke liye
+            }
+          }
+        }
+      }
+    });
   }
 }
 
