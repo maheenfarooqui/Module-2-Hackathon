@@ -1,15 +1,15 @@
 :root {
-  --bg-dark: #06181C;
-  --bg-card: #0B282E;
+  --bg-dark: #06181c;
+  --bg-card: #0b282e;
   --bg-input: #041013;
-  --text-main: #90C8DE;
-  --text-muted: #A3C0CA;
-  --accent-cyan: #8CE5ED;
-  --accent-teal: #124B57;
-  --white: #FFFFFF;
+  --text-main: #90c8de;
+  --text-muted: #a3c0ca;
+  --accent-cyan: #8ce5ed;
+  --accent-teal: #124b57;
+  --white: #ffffff;
   --sharp-border: 0px;
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Lato', sans-serif;
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Lato", sans-serif;
 }
 
 /* BASE STYLES */
@@ -44,15 +44,15 @@ body {
   z-index: 100;
 }
 #particle-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1; /* Background par le jaane ke liye negative z-index */
-    pointer-events: none;
-    overflow: hidden;
-    background-color: #06181C; /* Dark Hero Theme background */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* Background par le jaane ke liye negative z-index */
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #06181c; /* Dark Hero Theme background */
 }
 
 .brand-logo {
@@ -70,7 +70,7 @@ body {
 }
 
 .logo-text {
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
   font-size: 1.4rem;
   font-weight: 700;
   color: #ffffff;
@@ -170,7 +170,7 @@ body {
   font-size: 0.88rem;
   margin-top: 0.2rem;
 }
-.quick-actions a{
+.quick-actions a {
   text-decoration: none;
 }
 
@@ -426,6 +426,204 @@ body {
   flex-direction: column;
   gap: 0.8rem;
 }
+/* =========================================================
+   SWEETAL THEME
+   ========================================================= */
+
+.swal2-popup {
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 0 !important;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Modal title */
+.swal2-title {
+  color: var(--white) !important;
+  font-family: var(--font-heading) !important;
+}
+
+/* Modal text */
+.swal2-html-container {
+  color: var(--text-muted) !important;
+}
+
+/* Edit title input */
+.swal2-input,
+.swal2-textarea {
+  background: var(--bg-input) !important;
+  color: var(--text-main) !important;
+
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 0 !important;
+
+  box-shadow: none !important;
+}
+
+/* Input focus */
+.swal2-input:focus,
+.swal2-textarea:focus {
+  border-color: var(--accent-cyan) !important;
+
+  box-shadow: 0 0 0 1px var(--accent-cyan) !important;
+}
+
+/* Placeholder */
+.swal2-input::placeholder,
+.swal2-textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* Cancel button */
+.swal2-cancel {
+  background: var(--bg-input) !important;
+  color: var(--text-main) !important;
+
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 0 !important;
+}
+
+/* Cancel hover */
+.swal2-cancel:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* Confirm button */
+.swal2-confirm {
+  background: var(--accent-cyan) !important;
+  color: var(--bg-dark) !important;
+
+  border-radius: 0 !important;
+}
+
+/* Confirm hover */
+.swal2-confirm:hover {
+  opacity: 0.85;
+}
+
+/* SweetAlert close button */
+.swal2-close {
+  color: var(--text-muted) !important;
+}
+
+.swal2-close:hover {
+  color: var(--accent-cyan) !important;
+}
+
+/* Popup backdrop */
+.swal2-container {
+  background: rgba(0, 0, 0, 0.65) !important;
+} /* ============================= */
+/* POST ACTION BUTTONS            */
+/* ============================= */
+
+.activity-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: 10px;
+}
+
+.activity-actions button {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.edit-post-btn {
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+}
+
+.edit-post-btn:hover {
+  background: #38bdf8;
+  color: #06181c;
+}
+
+.delete-post-btn {
+  border: 1px solid #f87171;
+  color: #f87171;
+}
+
+.delete-post-btn:hover {
+  background: #f87171;
+  color: #06181c;
+} /* Block/Unblock & Delete Buttons Base Styling */
+.moderation-user .btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  padding: 4px 10px;
+}
+
+/* Block Button (Active Mode) */
+.btn-outline-secondary {
+  color: #a0aec0 !important;
+  border-color: rgba(160, 174, 192, 0.3) !important;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-outline-secondary:hover {
+  color: #ffffff !important;
+  background: rgba(220, 53, 69, 0.2) !important;
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+/* Unblock Button (When User is Banned) */
+.btn-outline-warning {
+  color: #ffc107 !important;
+  border-color: rgba(255, 193, 7, 0.4) !important;
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.btn-outline-warning:hover {
+  color: #000000 !important;
+  background: #ffc107 !important;
+  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+}
+
+/* Delete Button */
+.btn-outline-danger {
+  color: #ff4d4d !important;
+  border-color: rgba(255, 77, 77, 0.3) !important;
+  background: rgba(255, 77, 77, 0.05);
+}
+
+.btn-outline-danger:hover {
+  color: #ffffff !important;
+  background: #dc3545 !important;
+  box-shadow: 0 0 12px rgba(220, 53, 69, 0.5);
+}
+
+/* User Card Wrapper Styling */
+.moderation-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.moderation-user:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+}
 
 .mini-item {
   background-color: var(--bg-input);
@@ -576,7 +774,6 @@ body {
   background: var(--bg-card);
 }
 
-
 /* User Avatar */
 
 .moderation-user .user-profile-circle {
@@ -593,7 +790,6 @@ body {
 
   font-weight: 700;
 }
-
 
 /* User Information */
 
@@ -634,7 +830,6 @@ body {
 
   margin-top: 3px;
 }
-
 
 /* Delete Button */
 
@@ -685,7 +880,6 @@ body {
   border-color: var(--accent-cyan);
 }
 
-
 /* User Avatar */
 
 .activity-item .user-profile-circle {
@@ -706,7 +900,6 @@ body {
   font-size: 0.75rem;
   font-weight: 700;
 }
-
 
 /* Activity Content */
 
@@ -744,7 +937,6 @@ body {
   text-overflow: ellipsis;
 }
 
-
 /* Date */
 
 .activity-date {
@@ -757,11 +949,9 @@ body {
   white-space: nowrap;
 }
 
-
 /* Mobile */
 
 @media (max-width: 600px) {
-
   .activity-item {
     padding: 12px;
     gap: 10px;
@@ -774,14 +964,11 @@ body {
   .activity-description {
     max-width: 180px;
   }
-
 }
-
 
 /* Mobile */
 
 @media (max-width: 600px) {
-
   .moderation-user {
     padding: 12px;
     gap: 10px;
@@ -795,7 +982,6 @@ body {
     padding: 5px 9px;
     font-size: 0.7rem;
   }
-
 }
 
 /* RESPONSIVE BREAKPOINTS */
